@@ -160,11 +160,12 @@
         .modal.show { display: flex; animation: fadeIn 0.2s ease-out; }
         .modal-dialog { width: 100%; max-width: 800px; background: var(--bg-surface); border-radius: var(--border-radius-lg); display: flex; flex-direction: column; max-height: 90vh; box-shadow: var(--shadow-md); }
         .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 1.5rem; overflow-y: auto; }
+        /* FIX: Ensures the modal body triggers a scrollbar inside when content exceeds dialog height */
+        .modal-body { padding: 1.5rem; overflow-y: auto; flex-grow: 1; max-height: calc(100vh - 160px); }
         .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 1rem; }
         .btn-close { background: transparent; border: none; font-size: 1.5rem; line-height: 1; color: var(--text-secondary); cursor: pointer; }
 
-        /* Custom Year Select Formatting */
+        /* Custom Year Select Formatting (Clean, Single Box) */
         #globalYear {
             background: transparent !important;
             border: none !important;
