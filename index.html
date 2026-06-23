@@ -657,7 +657,12 @@
                     this.fetchFromAPI('getAllData', 'GET')
                         .then(res => { 
                             if (res.status === 'error') throw new Error(res.message);
-                            this.state = res; 
+                            console.log("[API Fetch Success]: Data synchronized.");
+                            this.state = {
+                                profil: res.profil || {},
+                                penempatan: res.penempatan || [],
+                                latihan: res.latihan || []
+                            };
                             this.populateYearDropdown(); 
                             this.renderAll(); 
                             this.hideLoader(); 
@@ -672,6 +677,9 @@
             fetchFromAPI: async function(actionName, method, payload = null) {
                 try {
                     let baseUrl = CONFIG.WEB_APP_URL.trim();
+                    if (!baseUrl || baseUrl === "PASTE_WEB_APP_URL_HERE") {
+                        throw new Error("WEB_APP_URL is not configured.");
+                    }
                     if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
                     
                     let url = new URL(baseUrl);
@@ -684,17 +692,27 @@
                     let options = { 
                         method: method,
                         redirect: 'follow',
-                        headers: { 'Accept': 'application/json' }
+                        cache: 'no-store' // Critical for preventing browser caching on refresh
                     };
 
                     if (method === 'POST') {
-                        options.headers['Content-Type'] = 'text/plain;charset=utf-8';
+                        options.headers = { 'Content-Type': 'text/plain;charset=utf-8' };
                         options.body = JSON.stringify({ action: actionName, data: payload });
                     }
 
                     const response = await fetch(url.toString(), options);
-                    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-                    return await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const rawText = await response.text();
+                    try {
+                        return JSON.parse(rawText);
+                    } catch (e) {
+                        console.error("API returned invalid JSON response:", rawText);
+                        throw new Error("Invalid server response. Check Google Apps Script deployment.");
+                    }
                 } catch (error) {
                     console.error("API Fetch Error:", error);
                     throw error;
@@ -812,18 +830,32 @@
             },
 
             populateYearDropdown: function() {
-                const years = [...new Set(this.state.latihan.map(d => new Date(d.tarikh).getFullYear()))].filter(y => !isNaN(y) && y).sort((a,b)=>b-a);
-                if(!years.includes(this.currentYear)) years.unshift(this.currentYear);
-                const select = document.getElementById('globalYear');
+                const years = [...new Set(this.state.latihan.map(d => {
+                    const date = new Date(d.tarikh);
+                    return isNaN(date.getTime()) ? null : date.getFullYear();
+                }))].filter(y => y !== null).sort((a,b)=>b-a);
                 
-                if (select.options.length === 0 || select.options[0].value !== years[0].toString()) {
-                    select.innerHTML = '';
-                    years.forEach(y => select.innerHTML += `<option value="${y}">${y}</option>`);
+                if(!years.includes(this.currentYear)) years.unshift(this.currentYear);
+                
+                const select = document.getElementById('globalYear');
+                const currentSelection = select.value;
+                
+                select.innerHTML = '';
+                years.forEach(y => {
+                    const option = document.createElement('option');
+                    option.value = y;
+                    option.textContent = y;
+                    select.appendChild(option);
+                });
+                
+                if (currentSelection && years.includes(parseInt(currentSelection))) {
+                    select.value = currentSelection;
+                } else {
                     select.value = this.currentYear;
                 }
                 
                 if(years.length > 0) {
-                    document.getElementById('dash-start-year').textContent = years[years.length - 1];
+                    document.getElementById('dash-start-year').textContent = Math.min(...years);
                 }
             },
             
@@ -995,7 +1027,7 @@
                 
                 if(!file) return;
                 
-                if(file.size > 5242880) { // 5MB limit
+                if(file.size > 5242880) { 
                     errDiv.textContent = "File too large. Max 5MB.";
                     errDiv.classList.remove('d-none');
                     e.target.value = '';
@@ -1175,12 +1207,13 @@
                 }
             },
             submitLatihanToBackend: function(record, fileObj) {
+                const isUpdate = !!record.id;
+                
                 const executeSave = () => {
-                    if(record.id) {
+                    if (isUpdate) {
                         const idx = this.state.latihan.findIndex(x => x.id === record.id);
                         if(idx > -1) this.state.latihan[idx] = record;
                     } else {
-                        record.id = 'MOCK_' + Date.now();
                         this.state.latihan.push(record);
                     }
                     this.populateYearDropdown(); this.renderAll();
@@ -1188,7 +1221,14 @@
                     this.showToast('Success', 'Training record saved.');
                 };
 
-                if(this.isMock) { setTimeout(() => { if(fileObj) record.sijilUrl = "#mock_url"; executeSave(); }, 800); return; }
+                if(this.isMock) { 
+                    setTimeout(() => { 
+                        if(fileObj) record.sijilUrl = "#mock_url"; 
+                        if(!isUpdate) record.id = 'MOCK_' + Date.now();
+                        executeSave(); 
+                    }, 800); 
+                    return; 
+                }
 
                 const payload = { record: record, fileObj: fileObj };
                 this.fetchFromAPI('saveLatihan', 'POST', payload)
@@ -1270,6 +1310,8 @@
                     status: document.getElementById('pn_status').value
                 };
 
+                const isUpdate = !!data.id;
+
                 const executeSave = () => {
                     if(data.status === 'Semasa') {
                         this.state.profil.jawatan = data.jawatan; this.state.profil.gred = data.gred;
@@ -1277,11 +1319,10 @@
                         this.state.profil.institut = data.institut;
                         this.state.penempatan.forEach(p => { if(p.id !== data.id) p.status = 'Tamat'; });
                     }
-                    if(data.id) {
+                    if (isUpdate) {
                         const idx = this.state.penempatan.findIndex(x => x.id === data.id);
                         if(idx > -1) this.state.penempatan[idx] = data;
                     } else {
-                        data.id = 'MOCK_' + Date.now();
                         this.state.penempatan.push(data);
                     }
                     this.renderPenempatan(); this.renderProfil();
@@ -1289,7 +1330,13 @@
                     this.showToast('Success', 'Placement record saved.');
                 };
 
-                if(this.isMock) { setTimeout(executeSave, 600); return; }
+                if(this.isMock) { 
+                    setTimeout(() => { 
+                        if(!isUpdate) data.id = 'MOCK_' + Date.now();
+                        executeSave(); 
+                    }, 600); 
+                    return; 
+                }
 
                 this.fetchFromAPI('savePenempatan', 'POST', data)
                     .then(res => {
@@ -1318,7 +1365,7 @@
                 }
             },
 
-            // --- Mock Data (Preview Logic) ---
+            // --- Mock Data ---
             loadMockData: function() {
                 this.state = {
                     profil: { nama: "Husna", jawatan: "Senior Analyst" },
