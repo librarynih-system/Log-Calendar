@@ -48,6 +48,7 @@
 
         /* Framework-free Grid System */
         .row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1rem; }
+        .row.g-3 { gap: 1rem; }
         .row.g-4 { gap: 1.5rem; }
         .col-12 { grid-column: span 12; }
         @media (min-width: 576px) { .col-sm-6 { grid-column: span 6; } }
@@ -160,7 +161,6 @@
         .modal.show { display: flex; animation: fadeIn 0.2s ease-out; }
         .modal-dialog { width: 100%; max-width: 800px; background: var(--bg-surface); border-radius: var(--border-radius-lg); display: flex; flex-direction: column; max-height: 90vh; box-shadow: var(--shadow-md); }
         .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        /* FIX: Ensures the modal body triggers a scrollbar inside when content exceeds dialog height */
         .modal-body { padding: 1.5rem; overflow-y: auto; flex-grow: 1; max-height: calc(100vh - 160px); }
         .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 1rem; }
         .btn-close { background: transparent; border: none; font-size: 1.5rem; line-height: 1; color: var(--text-secondary); cursor: pointer; }
@@ -192,11 +192,14 @@
             min-width: 130px;
         }
 
-        /* Profile Photo Upload Styles */
+        /* Profile & Profile Photo Upload Styles */
         .avatar-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); background-color: var(--bg-main); }
         .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; cursor: pointer; }
         .upload-btn-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; }
         .border-danger { border-color: #E53E3E !important; }
+        
+        .profile-label { font-size: 16px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; }
+        .profile-value { font-size: 13px; font-weight: 500; color: var(--text-primary); }
 
         /* Forms */
         .form-control, .form-select { display: block; width: 100%; background-color: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px; padding: 10px 14px; box-shadow: none; font-family: 'Inter', sans-serif; font-size: 1rem; }
@@ -264,7 +267,7 @@
             </nav>
             <div class="p-4 mt-4" style="border-top: 1px solid var(--border-color);">
                 <div class="d-flex align-items-center gap-3">
-                    <img src="https://ui-avatars.com/api/?name=User&background=F0F4EF&color=6E8B74&rounded=true&bold=true" id="sidebar-avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color);" alt="User">
+                    <img src="" id="sidebar-avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color);" alt="User">
                     <div>
                         <div class="font-heading" style="font-size: 0.9rem;" id="sidebar-name">User</div>
                         <div style="color: var(--text-secondary); font-size: 0.75rem;">Always learning 🌱</div>
@@ -436,21 +439,37 @@
                     <div class="d-flex flex-wrap gap-3 justify-content-end align-items-center mb-4">
                         <button class="btn btn-premium" onclick="app.openModal('modalProfil', true)"><i class="fas fa-pen me-2"></i>Edit Profile</button>
                     </div>
-                    <div class="surface-card p-4 p-md-5">
-                        <div class="row">
-                            <div class="col-md-3 text-center mb-4">
-                                <img src="" id="prof-avatar" class="rounded-circle" style="width: 140px; height: 140px; object-fit: cover; border: 4px solid var(--bg-main); box-shadow: var(--shadow-sm);" alt="Avatar">
+                    <div class="surface-card p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center mb-4 mb-md-0">
+                                <img src="" id="prof-avatar" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--bg-main); box-shadow: var(--shadow-sm);" alt="Avatar">
                             </div>
                             <div class="col-md-9">
-                                <div class="row g-4">
-                                    <div class="col-sm-6"><div class="text-secondary small fw-medium">Full Name</div><div class="font-heading fs-5" id="lbl-nama">-</div></div>
-                                    <div class="col-sm-6"><div class="text-secondary small fw-medium">Identity ID</div><div class="font-heading fs-5" id="lbl-nokp">-</div></div>
-                                    <div class="col-12"><hr></div>
-                                    <div class="col-sm-6"><div class="text-secondary small fw-medium">Position & Grade</div><div class="font-heading fs-6"><span id="lbl-jawatan">-</span> (<span id="lbl-gred">-</span>)</div></div>
-                                    <div class="col-sm-6"><div class="text-secondary small fw-medium">Placement</div><div class="font-heading fs-6"><span id="lbl-unit">-</span>, <span id="lbl-pusat">-</span></div><div class="text-secondary small mt-1" id="lbl-institut">-</div></div>
-                                    <div class="col-12"><hr></div>
-                                    <div class="col-sm-6"><div class="text-secondary small fw-medium">Email</div><div class="font-heading fs-6" id="lbl-email">-</div></div>
-                                    <div class="col-sm-6"><div class="text-secondary small fw-medium">Phone Number</div><div class="font-heading fs-6" id="lbl-tel">-</div></div>
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <div class="profile-label">Full Name</div>
+                                        <div class="profile-value" id="lbl-nama">-</div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="profile-label">Identity ID</div>
+                                        <div class="profile-value" id="lbl-nokp">-</div>
+                                    </div>
+                                    <div class="col-sm-6 mt-3 mt-sm-0">
+                                        <div class="profile-label">Position & Grade</div>
+                                        <div class="profile-value"><span id="lbl-jawatan">-</span> (<span id="lbl-gred">-</span>)</div>
+                                    </div>
+                                    <div class="col-sm-6 mt-3 mt-sm-0">
+                                        <div class="profile-label">Placement</div>
+                                        <div class="profile-value"><span id="lbl-unit">-</span>, <span id="lbl-pusat">-</span><br><span id="lbl-institut">-</span></div>
+                                    </div>
+                                    <div class="col-sm-6 mt-3 mt-sm-0">
+                                        <div class="profile-label">Email</div>
+                                        <div class="profile-value" id="lbl-email">-</div>
+                                    </div>
+                                    <div class="col-sm-6 mt-3 mt-sm-0">
+                                        <div class="profile-label">Phone Number</div>
+                                        <div class="profile-value" id="lbl-tel">-</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -459,9 +478,6 @@
 
                 <!-- MODULE 3: RECORDS -->
                 <section id="latihan" class="view-section">
-                    <div class="d-flex flex-wrap gap-3 justify-content-end align-items-center mb-4">
-                        <button class="btn btn-premium" onclick="app.openModal('modalLatihan', true)"><i class="fas fa-plus me-2"></i>Add Record</button>
-                    </div>
                     <div class="surface-card">
                         <div class="d-flex mb-3">
                             <input type="text" onkeyup="app.filterTable('tableLatihan', this.value)" placeholder="Search courses..." class="form-control" style="max-width: 300px;">
@@ -486,9 +502,6 @@
 
                 <!-- MODULE 4: CAREER JOURNEY -->
                 <section id="penempatan" class="view-section">
-                    <div class="d-flex flex-wrap gap-3 justify-content-end align-items-center mb-4">
-                        <button class="btn btn-premium" onclick="app.openModal('modalPenempatan', true)"><i class="fas fa-plus me-2"></i>Add Placement</button>
-                    </div>
                     <div class="surface-card">
                         <div class="d-flex mb-3">
                             <input type="text" onkeyup="app.filterTable('tablePenempatan', this.value)" placeholder="Search placements..." class="form-control" style="max-width: 300px;">
@@ -861,16 +874,38 @@
             
             updateAvatars: function(name, photoUrl) {
                 const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=F0F4EF&color=6E8B74&rounded=true&bold=true`;
-                const srcUrl = (photoUrl && photoUrl.length > 5) ? photoUrl : fallback;
+                let srcUrl = fallback;
                 
-                if(document.getElementById('sidebar-avatar')) document.getElementById('sidebar-avatar').src = srcUrl;
-                if(document.getElementById('prof-avatar')) document.getElementById('prof-avatar').src = srcUrl;
+                // Construct direct image link if it's a Google Drive link
+                if (photoUrl && photoUrl.length > 5) {
+                    srcUrl = photoUrl;
+                    if (srcUrl.includes('drive.google.com/file/d/')) {
+                        const match = srcUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                        if (match && match[1]) srcUrl = `https://drive.google.com/uc?id=${match[1]}`;
+                    }
+                }
+                
+                const applyImage = (id) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.onerror = function() { this.onerror = null; this.src = fallback; };
+                        el.src = srcUrl;
+                    }
+                };
+
+                applyImage('sidebar-avatar');
+                applyImage('prof-avatar');
                 
                 const dashAvatar = document.getElementById('dash-avatar');
                 const dashIcon = document.getElementById('dash-greeting-icon');
                 if(dashAvatar && dashIcon) {
-                    if(photoUrl && photoUrl.length > 5) {
-                        dashAvatar.src = photoUrl;
+                    if(srcUrl !== fallback) {
+                        dashAvatar.onerror = function() { 
+                            this.onerror = null; 
+                            this.style.display = 'none'; 
+                            dashIcon.style.display = 'block'; 
+                        };
+                        dashAvatar.src = srcUrl;
                         dashAvatar.style.display = 'block';
                         dashIcon.style.display = 'none';
                     } else {
@@ -1069,6 +1104,7 @@
                 ['nama', 'nokp', 'jawatan', 'gred', 'unit', 'pusat', 'institut', 'tel', 'email'].forEach(k => {
                     if(document.getElementById('lbl-'+k)) document.getElementById('lbl-'+k).textContent = p[k] || '-';
                 });
+                this.updateAvatars(p.nama, p.photoUrl);
             },
             
             handleProfilePhotoPreview: function(e) {
@@ -1121,7 +1157,19 @@
                 document.getElementById('p_photo_error').classList.add('d-none');
                 
                 const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama || 'User')}&background=F0F4EF&color=6E8B74&rounded=true&bold=true`;
-                document.getElementById('p_photo_preview').src = (p.photoUrl && p.photoUrl.length > 5) ? p.photoUrl : fallback;
+                
+                let prevUrl = fallback;
+                if (p.photoUrl && p.photoUrl.length > 5) {
+                    prevUrl = p.photoUrl;
+                    if (prevUrl.includes('drive.google.com/file/d/')) {
+                        const match = prevUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                        if (match && match[1]) prevUrl = `https://drive.google.com/uc?id=${match[1]}`;
+                    }
+                }
+                
+                const imgPreview = document.getElementById('p_photo_preview');
+                imgPreview.onerror = function() { this.onerror=null; this.src = fallback; };
+                imgPreview.src = prevUrl;
             },
             
             saveProfil: function(e) {
@@ -1272,14 +1320,7 @@
                     this.showToast('Success', 'Training record saved.');
                 };
 
-                if(this.isMock) { 
-                    setTimeout(() => { 
-                        if(fileObj) record.sijilUrl = "#mock_url"; 
-                        if(!isUpdate) record.id = 'MOCK_' + Date.now();
-                        executeSave(); 
-                    }, 800); 
-                    return; 
-                }
+                if(this.isMock) { setTimeout(() => { if(fileObj) record.sijilUrl = "#mock_url"; executeSave(); }, 800); return; }
 
                 const payload = { record: record, fileObj: fileObj };
                 this.fetchFromAPI('saveLatihan', 'POST', payload)
@@ -1381,13 +1422,7 @@
                     this.showToast('Success', 'Placement record saved.');
                 };
 
-                if(this.isMock) { 
-                    setTimeout(() => { 
-                        if(!isUpdate) data.id = 'MOCK_' + Date.now();
-                        executeSave(); 
-                    }, 600); 
-                    return; 
-                }
+                if(this.isMock) { setTimeout(executeSave, 600); return; }
 
                 this.fetchFromAPI('savePenempatan', 'POST', data)
                     .then(res => {
@@ -1419,7 +1454,7 @@
             // --- Mock Data (Preview Logic) ---
             loadMockData: function() {
                 this.state = {
-                    profil: { nama: "Husna", jawatan: "Senior Analyst" },
+                    profil: { nama: "Husna", jawatan: "Senior Analyst", photoUrl: "" },
                     penempatan: [],
                     latihan: [
                         { id: "1", tajuk: "MS Excel Advanced", kategori: "Technical", jenis: "Short Course", platform: "Online", anjuran: "Tech Academy", tarikh: `${this.currentYear}-05-10`, jam: "16", bayaran: "0" },
