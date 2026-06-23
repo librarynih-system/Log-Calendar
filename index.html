@@ -109,6 +109,7 @@
         .btn-premium:hover { background-color: #58735D; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(110, 139, 116, 0.3); }
         .btn-minimal { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--border-radius-sm); padding: 8px 16px; font-weight: 500; transition: 0.2s; }
         .btn-minimal:hover { background: var(--bg-surface-hover); border-color: var(--secondary-color); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed !important; pointer-events: none; }
         .mobile-toggle { display: none; background: transparent; border: none; font-size: 1.5rem; color: var(--text-primary); cursor: pointer; padding: 0; margin-right: 15px; }
 
         .greeting-box { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; }
@@ -240,7 +241,7 @@
     <!-- Global Loader -->
     <div id="loader" class="loader-overlay">
         <div class="spinner mb-3"></div>
-        <div class="font-heading text-secondary fs-6" style="color: var(--accent-color) !important;">Loading Journal...</div>
+        <div id="loader-text" class="font-heading text-secondary fs-6" style="color: var(--accent-color) !important;">Loading Journal...</div>
     </div>
 
     <div id="app-container">
@@ -286,6 +287,11 @@
                         </select>
                         <i class="fas fa-chevron-down position-absolute text-secondary" style="pointer-events: none; font-size: 0.9rem; right: 16px;"></i>
                     </div>
+
+                    <!-- Sync Data -->
+                    <button id="btn-sync" class="btn-minimal d-flex align-items-center gap-2" onclick="app.syncData()" title="Sync Data">
+                        <i class="fas fa-sync-alt text-secondary"></i> <span class="d-none d-sm-inline">Sync Data</span>
+                    </button>
 
                     <!-- Export PDF -->
                     <button class="btn-minimal d-flex align-items-center gap-2" onclick="window.print()" title="Export to PDF">
@@ -627,7 +633,7 @@
         // ==========================================
         const CONFIG = {
             // IMPORTANT: Replace this with your Google Apps Script Web App URL
-            WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzrOlgsePqqtXIvXuzli_fkcVnoM5sJepM-ytUpLL7gisY5uueeLWmVmqhB59ReEi-PWw/exec"
+            WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzrOlgsePqqtXIvXuzli_fkcVnoM5sJepM-ytUpLL7gisY5uueeLWmVmqhB59ReEi-PWw/execa"
         };
 
         const app = {
@@ -647,31 +653,67 @@
                 
                 if (this.isMock) {
                     console.warn("Using Mock Data: Please add your WEB_APP_URL to the CONFIG variable in app.js.");
+                }
+                
+                // Automatically run syncData on load
+                this.syncData(true);
+            },
+
+            syncData: function(isInit = false) {
+                const btn = document.getElementById('btn-sync');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.querySelector('i').classList.add('fa-spin');
+                }
+                
+                const loaderText = document.getElementById('loader-text');
+                if(loaderText) loaderText.textContent = isInit ? 'Loading Journal...' : 'Synchronizing data...';
+                
+                this.showLoader();
+
+                if (this.isMock) {
                     setTimeout(() => { 
                         this.loadMockData(); 
                         this.populateYearDropdown(); 
                         this.renderAll(); 
                         this.hideLoader(); 
-                    }, 500);
-                } else {
-                    this.fetchFromAPI('getAllData', 'GET')
-                        .then(res => { 
-                            if (res.status === 'error') throw new Error(res.message);
-                            console.log("[API Fetch Success]: Data synchronized.");
-                            this.state = {
-                                profil: res.profil || {},
-                                penempatan: res.penempatan || [],
-                                latihan: res.latihan || []
-                            };
-                            this.populateYearDropdown(); 
-                            this.renderAll(); 
-                            this.hideLoader(); 
-                        })
-                        .catch(err => { 
-                            this.hideLoader(); 
-                            this.showToast('Connection Error', 'Failed to fetch data: ' + err.message, 'error'); 
-                        });
+                        
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.querySelector('i').classList.remove('fa-spin');
+                        }
+                        if (!isInit) this.showToast('Success', 'Data synchronized successfully.');
+                    }, 800);
+                    return;
                 }
+
+                this.fetchFromAPI('getAllData', 'GET')
+                    .then(res => { 
+                        if (res.status === 'error') throw new Error(res.message);
+                        if (!isInit) console.log("[API Fetch Success]: Data synchronized.");
+                        this.state = {
+                            profil: res.profil || {},
+                            penempatan: res.penempatan || [],
+                            latihan: res.latihan || []
+                        };
+                        this.populateYearDropdown(); 
+                        this.renderAll(); 
+                        this.hideLoader(); 
+                        
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.querySelector('i').classList.remove('fa-spin');
+                        }
+                        if (!isInit) this.showToast('Success', 'Data synchronized successfully.');
+                    })
+                    .catch(err => { 
+                        this.hideLoader(); 
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.querySelector('i').classList.remove('fa-spin');
+                        }
+                        this.showToast('Synchronization failed', err.message || 'Please try again.', 'error'); 
+                    });
             },
 
             fetchFromAPI: async function(actionName, method, payload = null) {
