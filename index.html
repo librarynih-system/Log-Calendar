@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Learning Journal</title>
     
+    <!-- External Dependencies: Vanilla Fonts and Icons ONLY -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Inline CSS -->
     <style>
         :root {
             /* Sage Green Theme Palette */
@@ -150,7 +152,7 @@
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Custom Modals */
+        /* Custom Modals (Framework-free) */
         .modal { display: none; position: fixed; inset: 0; z-index: 1060; background: rgba(45, 55, 72, 0.4); backdrop-filter: blur(2px); justify-content: center; align-items: center; padding: 1rem; }
         .modal.show { display: flex; animation: fadeIn 0.2s ease-out; }
         .modal-dialog { width: 100%; max-width: 800px; background: var(--bg-surface); border-radius: var(--border-radius-lg); display: flex; flex-direction: column; max-height: 90vh; box-shadow: var(--shadow-md); }
@@ -158,6 +160,33 @@
         .modal-body { padding: 1.5rem; overflow-y: auto; }
         .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 1rem; }
         .btn-close { background: transparent; border: none; font-size: 1.5rem; line-height: 1; color: var(--text-secondary); cursor: pointer; }
+
+        /* Custom Year Select Formatting (Clean, Single Box) */
+        #globalYear {
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100%;
+        }
+        #globalYear:focus {
+            background: transparent !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .year-select-container {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            background: #F3F4F6;
+            box-shadow: none;
+            padding: 8px 20px;
+            min-width: 130px;
+        }
 
         /* Profile Photo Upload Styles */
         .avatar-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); background-color: var(--bg-main); }
@@ -208,14 +237,17 @@
 </head>
 <body>
 
+    <!-- Global Loader -->
     <div id="loader" class="loader-overlay">
         <div class="spinner mb-3"></div>
         <div class="font-heading text-secondary fs-6" style="color: var(--accent-color) !important;">Loading Journal...</div>
     </div>
 
     <div id="app-container">
+        <!-- Mobile Sidebar Overlay -->
         <div id="sidebar-overlay" onclick="app.toggleSidebar()"></div>
 
+        <!-- SIDEBAR -->
         <aside id="sidebar">
             <div class="brand-header d-flex align-items-center gap-3">
                 <i class="fas fa-leaf" style="color: var(--accent-color);"></i> Learning Journal
@@ -237,6 +269,7 @@
             </div>
         </aside>
 
+        <!-- MAIN CONTENT -->
         <main id="main-content">
             <nav class="top-nav">
                 <div class="d-flex align-items-center">
@@ -244,17 +277,22 @@
                     <h2 class="font-heading mb-0 fs-4" id="page-title">Dashboard</h2>
                 </div>
                 
+                <!-- TOP CONTROLS (Only visible on Dashboard) -->
                 <div class="d-flex align-items-center gap-2 gap-md-3" id="dashboard-controls">
-                    <div class="position-relative d-flex align-items-center" style="border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 5px 12px; background: var(--bg-surface); box-shadow: var(--shadow-sm);">
-                        <select id="globalYear" class="form-select border-0 bg-transparent font-heading fw-bold shadow-none pe-4 py-0" style="cursor: pointer; font-size: 1.15rem; color: var(--text-primary); appearance: none; -webkit-appearance: none; background-image: none;" onchange="app.renderAll()">
+                    <!-- Year Dropdown (Clean, Single Box) -->
+                    <div class="position-relative d-flex align-items-center year-select-container">
+                        <select id="globalYear" class="font-heading fw-bold" style="cursor: pointer; font-size: 1.15rem; color: var(--text-primary);" onchange="app.renderAll()">
+                            <!-- Populated dynamically -->
                         </select>
-                        <i class="fas fa-chevron-down text-secondary position-absolute" style="right: 12px; pointer-events: none; font-size: 0.85rem;"></i>
+                        <i class="fas fa-chevron-down position-absolute text-secondary" style="pointer-events: none; font-size: 0.9rem; right: 16px;"></i>
                     </div>
 
+                    <!-- Export PDF -->
                     <button class="btn-minimal d-flex align-items-center gap-2" onclick="window.print()" title="Export to PDF">
                         <i class="fas fa-file-pdf" style="color: #E53E3E;"></i> <span class="d-none d-sm-inline">Export PDF</span>
                     </button>
 
+                    <!-- Add Course -->
                     <button class="btn-premium d-flex align-items-center gap-2" onclick="app.openModal('modalLatihan', true)">
                         <i class="fas fa-plus"></i> <span class="d-none d-sm-inline">Add Course</span>
                     </button>
@@ -263,6 +301,7 @@
 
             <div class="content-area pt-2">
                 
+                <!-- MODULE 1: DASHBOARD -->
                 <section id="dashboard" class="view-section active">
                     <div class="greeting-box">
                         <img src="" id="dash-avatar" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid var(--primary-color); box-shadow: var(--shadow-sm); display:none;" alt="User">
@@ -383,6 +422,7 @@
                     </div>
                 </section>
 
+                <!-- MODULE 2: PROFILE -->
                 <section id="profil" class="view-section">
                     <div class="d-flex flex-wrap gap-3 justify-content-end align-items-center mb-4">
                         <button class="btn btn-premium" onclick="app.openModal('modalProfil', true)"><i class="fas fa-pen me-2"></i>Edit Profile</button>
@@ -390,7 +430,7 @@
                     <div class="surface-card p-4 p-md-5">
                         <div class="row">
                             <div class="col-md-3 text-center mb-4">
-                                <img src="https://ui-avatars.com/api/?name=User&background=F0F4EF&color=6E8B74&rounded=true&bold=true" id="prof-avatar" class="rounded-circle" style="width: 140px; height: 140px; object-fit: cover; border: 4px solid var(--bg-main); box-shadow: var(--shadow-sm);" alt="Avatar">
+                                <img src="" id="prof-avatar" class="rounded-circle" style="width: 140px; height: 140px; object-fit: cover; border: 4px solid var(--bg-main); box-shadow: var(--shadow-sm);" alt="Avatar">
                             </div>
                             <div class="col-md-9">
                                 <div class="row g-4">
@@ -408,10 +448,8 @@
                     </div>
                 </section>
 
+                <!-- MODULE 3: RECORDS -->
                 <section id="latihan" class="view-section">
-                    <div class="d-flex flex-wrap gap-3 justify-content-end align-items-center mb-4">
-                        <button class="btn btn-premium" onclick="app.openModal('modalLatihan', true)"><i class="fas fa-plus me-2"></i>Add Record</button>
-                    </div>
                     <div class="surface-card">
                         <div class="d-flex mb-3">
                             <input type="text" onkeyup="app.filterTable('tableLatihan', this.value)" placeholder="Search courses..." class="form-control" style="max-width: 300px;">
@@ -434,10 +472,8 @@
                     </div>
                 </section>
 
+                <!-- MODULE 4: CAREER JOURNEY -->
                 <section id="penempatan" class="view-section">
-                    <div class="d-flex flex-wrap gap-3 justify-content-end align-items-center mb-4">
-                        <button class="btn btn-premium" onclick="app.openModal('modalPenempatan', true)"><i class="fas fa-plus me-2"></i>Add Placement</button>
-                    </div>
                     <div class="surface-card">
                         <div class="d-flex mb-3">
                             <input type="text" onkeyup="app.filterTable('tablePenempatan', this.value)" placeholder="Search placements..." class="form-control" style="max-width: 300px;">
@@ -462,12 +498,15 @@
         </main>
     </div>
 
+    <!-- Modals (Vanilla DOM) -->
+    <!-- Profile Modal (With Photo Upload) -->
     <div class="modal" id="modalProfil">
         <div class="modal-dialog">
             <form onsubmit="app.saveProfil(event)">
                 <div class="modal-header"><h5 class="font-heading mb-0">Edit Profile</h5><button type="button" class="btn-close" onclick="app.closeModal('modalProfil')"><i class="fas fa-times"></i></button></div>
                 <div class="modal-body">
                     <div class="row g-4">
+                        <!-- Profile Photo Section -->
                         <div class="col-12 text-center mb-2">
                             <img src="" id="p_photo_preview" class="avatar-preview mb-3" alt="Preview">
                             <div class="d-flex justify-content-center gap-2">
@@ -500,6 +539,7 @@
         </div>
     </div>
 
+    <!-- Training Modal -->
     <div class="modal" id="modalLatihan">
         <div class="modal-dialog">
             <form id="formLatihan" onsubmit="app.saveLatihan(event)">
@@ -548,6 +588,7 @@
         </div>
     </div>
 
+    <!-- Placement Modal -->
     <div class="modal" id="modalPenempatan">
         <div class="modal-dialog">
             <form id="formPenempatan" onsubmit="app.savePenempatan(event)">
@@ -613,7 +654,7 @@
                         this.hideLoader(); 
                     }, 500);
                 } else {
-                    this.fetchFromAPI('?action=getAllData', 'GET')
+                    this.fetchFromAPI('getAllData', 'GET')
                         .then(res => { 
                             if (res.status === 'error') throw new Error(res.message);
                             this.state = res; 
@@ -628,17 +669,36 @@
                 }
             },
 
-            fetchFromAPI: async function(endpointParams, method, payload = null) {
-                let url = CONFIG.WEB_APP_URL + (method === 'GET' ? endpointParams : '');
-                let options = { method: method };
+            fetchFromAPI: async function(actionName, method, payload = null) {
+                try {
+                    let baseUrl = CONFIG.WEB_APP_URL.trim();
+                    if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+                    
+                    let url = new URL(baseUrl);
+                    
+                    if (method === 'GET') {
+                        url.searchParams.append('action', actionName);
+                        url.searchParams.append('nocache', new Date().getTime()); 
+                    }
+                    
+                    let options = { 
+                        method: method,
+                        redirect: 'follow',
+                        headers: { 'Accept': 'application/json' }
+                    };
 
-                if (method === 'POST') {
-                    options.body = JSON.stringify(payload);
+                    if (method === 'POST') {
+                        options.headers['Content-Type'] = 'text/plain;charset=utf-8';
+                        options.body = JSON.stringify({ action: actionName, data: payload });
+                    }
+
+                    const response = await fetch(url.toString(), options);
+                    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error("API Fetch Error:", error);
+                    throw error;
                 }
-
-                const response = await fetch(url, options);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return await response.json();
             },
 
             // --- UI Setup ---
@@ -659,7 +719,6 @@
                         let titleMap = { 'dashboard': 'Dashboard', 'profil': 'My Profile', 'latihan': 'Training Records', 'penempatan': 'Placement History' };
                         document.getElementById('page-title').textContent = titleMap[target];
 
-                        // Show/Hide Top Right Controls based on active tab
                         const dashControls = document.getElementById('dashboard-controls');
                         if (target === 'dashboard') {
                             dashControls.style.display = 'flex';
@@ -731,7 +790,6 @@
                 });
             },
             
-            // Universal Avatars Update
             updateAvatars: function(name, photoUrl) {
                 const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=F0F4EF&color=6E8B74&rounded=true&bold=true`;
                 const srcUrl = (photoUrl && photoUrl.length > 5) ? photoUrl : fallback;
@@ -757,9 +815,12 @@
                 const years = [...new Set(this.state.latihan.map(d => new Date(d.tarikh).getFullYear()))].filter(y => !isNaN(y) && y).sort((a,b)=>b-a);
                 if(!years.includes(this.currentYear)) years.unshift(this.currentYear);
                 const select = document.getElementById('globalYear');
-                select.innerHTML = '';
-                years.forEach(y => select.innerHTML += `<option value="${y}">${y}</option>`);
-                select.value = this.currentYear;
+                
+                if (select.options.length === 0 || select.options[0].value !== years[0].toString()) {
+                    select.innerHTML = '';
+                    years.forEach(y => select.innerHTML += `<option value="${y}">${y}</option>`);
+                    select.value = this.currentYear;
+                }
                 
                 if(years.length > 0) {
                     document.getElementById('dash-start-year').textContent = years[years.length - 1];
@@ -775,7 +836,9 @@
 
             // --- MODULE 1: DASHBOARD ---
             renderDashboard: function() {
-                const globalYear = parseInt(document.getElementById('globalYear').value);
+                let globalYear = parseInt(document.getElementById('globalYear').value);
+                if(isNaN(globalYear)) globalYear = this.currentYear;
+                
                 const data = this.state.latihan;
                 const yearData = data.filter(d => new Date(d.tarikh).getFullYear() === globalYear);
                 
@@ -1029,8 +1092,8 @@
                     return;
                 }
 
-                const payload = { action: "saveProfil", data: { record: record, fileObj: fileObj } };
-                this.fetchFromAPI(null, 'POST', payload)
+                const payload = { record: record, fileObj: fileObj };
+                this.fetchFromAPI('saveProfil', 'POST', payload)
                     .then(res => {
                         if(res.status === 'error') throw new Error(res.message);
                         if(res.photoUrl !== undefined) record.photoUrl = res.photoUrl;
@@ -1127,8 +1190,8 @@
 
                 if(this.isMock) { setTimeout(() => { if(fileObj) record.sijilUrl = "#mock_url"; executeSave(); }, 800); return; }
 
-                const payload = { action: "saveLatihan", data: { record: record, fileObj: fileObj } };
-                this.fetchFromAPI(null, 'POST', payload)
+                const payload = { record: record, fileObj: fileObj };
+                this.fetchFromAPI('saveLatihan', 'POST', payload)
                     .then(res => {
                         if(res.status === 'error') throw new Error(res.message);
                         record.id = res.id; if(res.sijilUrl) record.sijilUrl = res.sijilUrl;
@@ -1145,8 +1208,8 @@
                             this.showToast('Deleted!', 'Record has been removed.');
                         }, 500); return;
                     }
-                    const payload = { action: "deleteRecord", data: { id: id, type: 'LATIHAN' } };
-                    this.fetchFromAPI(null, 'POST', payload)
+                    const payload = { id: id, type: 'LATIHAN' };
+                    this.fetchFromAPI('deleteRecord', 'POST', payload)
                         .then(res => {
                             if(res.status === 'error') throw new Error(res.message);
                             this.state.latihan = this.state.latihan.filter(x => x.id !== id);
@@ -1228,8 +1291,7 @@
 
                 if(this.isMock) { setTimeout(executeSave, 600); return; }
 
-                const payload = { action: "savePenempatan", data: data };
-                this.fetchFromAPI(null, 'POST', payload)
+                this.fetchFromAPI('savePenempatan', 'POST', data)
                     .then(res => {
                         if(res.status === 'error') throw new Error(res.message);
                         data.id = res.id; executeSave();
@@ -1245,8 +1307,8 @@
                             this.showToast('Deleted!', 'Placement has been removed.');
                         }, 500); return;
                     }
-                    const payload = { action: "deleteRecord", data: { id: id, type: 'PENEMPATAN' } };
-                    this.fetchFromAPI(null, 'POST', payload)
+                    const payload = { id: id, type: 'PENEMPATAN' };
+                    this.fetchFromAPI('deleteRecord', 'POST', payload)
                         .then(res => {
                             if(res.status === 'error') throw new Error(res.message);
                             this.state.penempatan = this.state.penempatan.filter(x => x.id !== id);
