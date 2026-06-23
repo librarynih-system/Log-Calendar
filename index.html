@@ -40,7 +40,8 @@
 
         /* Base & Reset */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
         h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); }
         a { text-decoration: none; transition: 0.2s; }
         button { font-family: inherit; }
@@ -84,12 +85,12 @@
         hr { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; }
 
         /* App Layout */
-        #app-container { display: flex; min-height: 100vh; }
+        #app-container { display: flex; height: 100%; width: 100%; overflow: hidden; }
         #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(45, 55, 72, 0.4); z-index: 1040; backdrop-filter: blur(2px); transition: 0.3s; opacity: 0; }
         #sidebar-overlay.show { display: block; opacity: 1; }
 
-        #sidebar { width: 260px; min-width: 260px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 1050; transition: 0.3s transform ease-in-out; }
-        .brand-header { padding: 2rem 1.5rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); }
+        #sidebar { width: 260px; min-width: 260px; height: 100%; overflow-y: auto; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 1050; transition: 0.3s transform ease-in-out; }
+        .brand-header { padding: 2rem 1.5rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); flex-shrink: 0; }
         .nav-menu { padding: 0 1rem; flex-grow: 1; }
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 6px; border-radius: var(--border-radius-sm); color: var(--text-secondary); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: 0.2s; }
         .nav-item i { width: 20px; font-size: 1.1rem; }
@@ -97,9 +98,10 @@
         .nav-item.active { background-color: var(--primary-color); color: #FFFFFF; font-weight: 600; box-shadow: var(--shadow-sm); }
         .nav-item.active i { color: #FFFFFF; }
 
-        #main-content { flex-grow: 1; display: flex; flex-direction: column; max-width: 100vw; min-width: 0; }
-        .top-nav { padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center; }
-        .content-area { padding: 0 2.5rem 3rem 2.5rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+        #main-content { flex-grow: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; overflow: hidden; }
+        .top-nav { padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .content-area { padding: 0 2.5rem 5rem 2.5rem; max-width: 1400px; margin: 0 auto; width: 100%; flex-grow: 1; overflow-y: auto; height: 100%; }
+        
         .surface-card { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); }
 
         /* Buttons */
@@ -162,7 +164,7 @@
         .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 1rem; }
         .btn-close { background: transparent; border: none; font-size: 1.5rem; line-height: 1; color: var(--text-secondary); cursor: pointer; }
 
-        /* Custom Year Select Formatting (Clean, Single Box) */
+        /* Custom Year Select Formatting */
         #globalYear {
             background: transparent !important;
             border: none !important;
@@ -213,10 +215,10 @@
 
         /* Responsive Breakpoints */
         @media (max-width: 991px) {
-            #sidebar { position: fixed; left: -260px; height: 100vh; }
+            #sidebar { position: fixed; left: -260px; height: 100%; }
             #sidebar.show { transform: translateX(260px); }
             .mobile-toggle { display: block; }
-            .content-area { padding: 0 1rem 2rem 1rem; }
+            .content-area { padding: 0 1rem 3rem 1rem; }
             .top-nav { padding: 1rem; }
             .cal-day { min-height: 60px; }
         }
@@ -456,6 +458,9 @@
 
                 <!-- MODULE 3: RECORDS -->
                 <section id="latihan" class="view-section">
+                    <div class="d-flex flex-wrap gap-3 justify-content-end align-items-center mb-4">
+                        <button class="btn btn-premium" onclick="app.openModal('modalLatihan', true)"><i class="fas fa-plus me-2"></i>Add Record</button>
+                    </div>
                     <div class="surface-card">
                         <div class="d-flex mb-3">
                             <input type="text" onkeyup="app.filterTable('tableLatihan', this.value)" placeholder="Search courses..." class="form-control" style="max-width: 300px;">
@@ -480,6 +485,9 @@
 
                 <!-- MODULE 4: CAREER JOURNEY -->
                 <section id="penempatan" class="view-section">
+                    <div class="d-flex flex-wrap gap-3 justify-content-end align-items-center mb-4">
+                        <button class="btn btn-premium" onclick="app.openModal('modalPenempatan', true)"><i class="fas fa-plus me-2"></i>Add Placement</button>
+                    </div>
                     <div class="surface-card">
                         <div class="d-flex mb-3">
                             <input type="text" onkeyup="app.filterTable('tablePenempatan', this.value)" placeholder="Search placements..." class="form-control" style="max-width: 300px;">
@@ -1407,7 +1415,7 @@
                 }
             },
 
-            // --- Mock Data ---
+            // --- Mock Data (Preview Logic) ---
             loadMockData: function() {
                 this.state = {
                     profil: { nama: "Husna", jawatan: "Senior Analyst" },
