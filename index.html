@@ -881,7 +881,7 @@
                     srcUrl = photoUrl;
                     if (srcUrl.includes('drive.google.com/file/d/')) {
                         const match = srcUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                        if (match && match[1]) srcUrl = `https://drive.google.com/uc?id=${match[1]}`;
+                        if (match && match[1]) srcUrl = `https://lh3.googleusercontent.com/d/${match[1]}`;
                     }
                 }
                 
@@ -1104,7 +1104,6 @@
                 ['nama', 'nokp', 'jawatan', 'gred', 'unit', 'pusat', 'institut', 'tel', 'email'].forEach(k => {
                     if(document.getElementById('lbl-'+k)) document.getElementById('lbl-'+k).textContent = p[k] || '-';
                 });
-                this.updateAvatars(p.nama, p.photoUrl);
             },
             
             handleProfilePhotoPreview: function(e) {
@@ -1163,7 +1162,7 @@
                     prevUrl = p.photoUrl;
                     if (prevUrl.includes('drive.google.com/file/d/')) {
                         const match = prevUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                        if (match && match[1]) prevUrl = `https://drive.google.com/uc?id=${match[1]}`;
+                        if (match && match[1]) prevUrl = `https://lh3.googleusercontent.com/d/${match[1]}`;
                     }
                 }
                 
@@ -1320,7 +1319,14 @@
                     this.showToast('Success', 'Training record saved.');
                 };
 
-                if(this.isMock) { setTimeout(() => { if(fileObj) record.sijilUrl = "#mock_url"; executeSave(); }, 800); return; }
+                if(this.isMock) { 
+                    setTimeout(() => { 
+                        if(fileObj) record.sijilUrl = "#mock_url"; 
+                        if(!isUpdate) record.id = 'MOCK_' + Date.now();
+                        executeSave(); 
+                    }, 800); 
+                    return; 
+                }
 
                 const payload = { record: record, fileObj: fileObj };
                 this.fetchFromAPI('saveLatihan', 'POST', payload)
@@ -1454,7 +1460,7 @@
             // --- Mock Data (Preview Logic) ---
             loadMockData: function() {
                 this.state = {
-                    profil: { nama: "Husna", jawatan: "Senior Analyst", photoUrl: "" },
+                    profil: { nama: "Husna", jawatan: "Senior Analyst" },
                     penempatan: [],
                     latihan: [
                         { id: "1", tajuk: "MS Excel Advanced", kategori: "Technical", jenis: "Short Course", platform: "Online", anjuran: "Tech Academy", tarikh: `${this.currentYear}-05-10`, jam: "16", bayaran: "0" },
