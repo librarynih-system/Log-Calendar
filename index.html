@@ -439,7 +439,7 @@
                     <div class="d-flex flex-wrap gap-3 justify-content-end align-items-center mb-4">
                         <button class="btn btn-premium" onclick="app.openModal('modalProfil', true)"><i class="fas fa-pen me-2"></i>Edit Profile</button>
                     </div>
-                    <div class="surface-card p-4">
+                    <div class="surface-card p-4 p-md-5">
                         <div class="row align-items-center">
                             <div class="col-md-3 text-center mb-4 mb-md-0">
                                 <img src="" id="prof-avatar" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--bg-main); box-shadow: var(--shadow-sm);" alt="Avatar">
@@ -486,11 +486,13 @@
                             <table class="custom-table" id="tableLatihan">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Course Details</th>
-                                        <th>Date & Location</th>
-                                        <th>Hours</th>
-                                        <th>Certificate</th>
+                                        <th>Tajuk Latihan & Anjuran</th>
+                                        <th>Kategori & Jenis</th>
+                                        <th>Platform & Lokasi</th>
+                                        <th>Tarikh (Mula - Tamat)</th>
+                                        <th>Jumlah Hari @ Jam</th>
+                                        <th>Bayaran (RM)</th>
+                                        <th>Sijil</th>
                                         <th class="text-end">Actions</th>
                                     </tr>
                                 </thead>
@@ -567,7 +569,7 @@
         </div>
     </div>
 
-    <!-- Training Modal -->
+    <!-- LATIHAN MODAL DIKEMASKINI -->
     <div class="modal" id="modalLatihan">
         <div class="modal-dialog">
             <form id="formLatihan" onsubmit="app.saveLatihan(event)">
@@ -575,40 +577,62 @@
                 <div class="modal-header"><h5 class="font-heading mb-0" id="l_modal_title">Add Course</h5><button type="button" class="btn-close" onclick="app.closeModal('modalLatihan')"><i class="fas fa-times"></i></button></div>
                 <div class="modal-body">
                     <div class="row g-3">
-                        <div class="col-12"><label class="form-label">Course Title</label><input type="text" id="l_tajuk" class="form-control" required></div>
-                        <div class="col-md-4">
-                            <label class="form-label">Category</label>
+                        <div class="col-12">
+                            <label class="form-label">TAJUK LATIHAN <span class="text-danger">*</span></label>
+                            <input type="text" id="l_tajuk" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">KATEGORI LATIHAN <span class="text-danger">*</span></label>
                             <select id="l_kategori" class="form-select" required>
-                                <option value="">Select...</option>
-                                <option value="Technical">Technical</option>
-                                <option value="Soft Skills">Soft Skills</option>
-                                <option value="Management">Management</option>
-                                <option value="Personal Development">Personal Development</option>
-                                <option value="Others">Others</option>
+                                <option value="">Pilih...</option>
+                                <option value="DALAM NEGERI">DALAM NEGERI</option>
+                                <option value="LUAR NEGARA">LUAR NEGARA</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Format</label>
+                        <div class="col-md-6">
+                            <label class="form-label">JENIS LATIHAN <span class="text-danger">*</span></label>
                             <select id="l_jenis" class="form-select" required>
-                                <option value="Short Course">Short Course</option>
-                                <option value="Workshop">Workshop</option>
-                                <option value="Seminar">Seminar</option>
+                                <option value="">Pilih...</option>
+                                <option value="FUNCTIONAL">FUNCTIONAL</option>
+                                <option value="GENERIK">GENERIK</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Platform</label>
+                        <div class="col-md-6">
+                            <label class="form-label">PLATFORM LATIHAN <span class="text-danger">*</span></label>
                             <select id="l_platform" class="form-select" required>
-                                <option value="In-Person">In-Person</option>
-                                <option value="Online">Online</option>
+                                <option value="">Pilih...</option>
+                                <option value="BERSEMUKA">BERSEMUKA</option>
+                                <option value="TIDAK BERSEMUKA (ATAS TALIAN)">TIDAK BERSEMUKA (ATAS TALIAN)</option>
                             </select>
                         </div>
-                        <div class="col-md-6"><label class="form-label">Organizer</label><input type="text" id="l_anjuran" class="form-control" required></div>
-                        <div class="col-md-6"><label class="form-label">Location</label><input type="text" id="l_lokasi" class="form-control"></div>
-                        <div class="col-md-4"><label class="form-label">Date</label><input type="date" id="l_tarikh" class="form-control" required></div>
-                        <div class="col-md-4"><label class="form-label">Total Hours</label><input type="number" id="l_jam" class="form-control" min="1" required></div>
-                        <div class="col-md-4"><label class="form-label">Cost (RM)</label><input type="number" id="l_bayaran" class="form-control" step="0.01" min="0" value="0"></div>
-                        <div class="col-12"><label class="form-label">Notes</label><textarea id="l_catatan" class="form-control" rows="2"></textarea></div>
-                        <div class="col-12"><label class="form-label">Certificate</label><input class="form-control" type="file" id="l_sijil_file"></div>
+                        <div class="col-md-6">
+                            <label class="form-label">ALAMAT LOKASI</label>
+                            <input type="text" id="l_lokasi" class="form-control" placeholder="Nama platform jika online">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">ANJURAN</label>
+                            <input type="text" id="l_anjuran" class="form-control" placeholder="Contoh: INTAN, KKM, JPA...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">TARIKH MULA <span class="text-danger">*</span></label>
+                            <input type="date" id="l_tarikh_mula" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">TARIKH TAMAT <span class="text-danger">*</span></label>
+                            <input type="date" id="l_tarikh_tamat" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">JUMLAH HARI @ JAM (Contoh: 2H@3J)</label>
+                            <input type="text" id="l_jam" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">BAYARAN (RM) (JIKA ADA)</label>
+                            <input type="number" id="l_bayaran" class="form-control" step="0.01" min="0">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">SIJIL (JIKA ADA SILA LAMPIRKAN BERSAMA)</label>
+                            <input class="form-control" type="file" id="l_sijil_file" accept=".pdf,.jpg,.jpeg,.png">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-minimal" onclick="app.closeModal('modalLatihan')">Cancel</button><button type="submit" class="btn btn-premium">Save Record</button></div>
@@ -952,6 +976,22 @@
                 this.renderPenempatan();
             },
 
+            // --- HELPER UNTUK KIRAAN MASA ---
+            extractHours: function(jamStr) {
+                if(!jamStr) return 0;
+                const str = jamStr.toString().toUpperCase();
+                let total = 0;
+                
+                const matchJ = str.match(/(\d+)\s*J/);
+                const matchH = str.match(/(\d+)\s*H/);
+                
+                if(matchJ) total += parseInt(matchJ[1]);
+                if(matchH) total += (parseInt(matchH[1]) * 8); // Andaian 1 Hari = 8 Jam
+                
+                if(!matchJ && !matchH) return parseFloat(str) || 0;
+                return total;
+            },
+
             // --- MODULE 1: DASHBOARD ---
             renderDashboard: function() {
                 let globalYear = parseInt(document.getElementById('globalYear').value);
@@ -967,7 +1007,9 @@
                 this.updateAvatars(name, this.state.profil.photoUrl);
 
                 document.getElementById('stat-courses').textContent = yearData.length;
-                const hours = yearData.reduce((s, d) => s + (parseFloat(d.jam) || 0), 0);
+                
+                // Gunakan fungsi extractHours yang dikemaskini
+                const hours = yearData.reduce((s, d) => s + this.extractHours(d.jam), 0);
                 document.getElementById('stat-hours').textContent = hours;
                 document.getElementById('stat-certs').textContent = yearData.filter(d => d.sijilUrl && d.sijilUrl.length > 5).length;
                 document.getElementById('stat-cost').textContent = "RM " + yearData.reduce((s, d) => s + (parseFloat(d.bayaran) || 0), 0).toLocaleString('en-US');
@@ -1078,7 +1120,7 @@
                 const mData = new Array(12).fill(0);
                 yearData.forEach(d => {
                     const m = new Date(d.tarikh).getMonth();
-                    if(!isNaN(m)) mData[m] += (parseFloat(d.jam) || 0);
+                    if(!isNaN(m)) mData[m] += this.extractHours(d.jam);
                 });
 
                 if(this.charts.trend) this.charts.trend.destroy();
@@ -1236,14 +1278,32 @@
                 const sortedLatihan = [...this.state.latihan].sort((a, b) => new Date(b.tarikh) - new Date(a.tarikh));
                 const tbody = document.querySelector('#tableLatihan tbody');
                 tbody.innerHTML = '';
-                sortedLatihan.forEach((d, i) => {
+                sortedLatihan.forEach((d) => {
                     const cert = (d.sijilUrl && d.sijilUrl.length > 5) ? `<a href="${d.sijilUrl}" target="_blank" style="color: var(--accent-color);"><i class="fas fa-certificate"></i> View</a>` : `-`;
+                    
+                    const tarikhMula = d.tarikh || '-';
+                    const tarikhTamat = d.tarikhTamat || '-';
+
                     tbody.innerHTML += `
                         <tr>
-                            <td class="text-secondary">${i + 1}</td>
-                            <td><div class="font-heading fw-semibold">${d.tajuk}</div><div class="small text-secondary">${d.anjuran}</div></td>
-                            <td><div class="small">${d.tarikh}</div><div class="small text-secondary">${d.lokasi || d.platform}</div></td>
-                            <td><span class="font-heading fw-semibold">${d.jam}</span></td>
+                            <td>
+                                <div class="font-heading fw-semibold">${d.tajuk || '-'}</div>
+                                <div class="small text-secondary"><i class="fas fa-building me-1"></i>${d.anjuran || '-'}</div>
+                            </td>
+                            <td>
+                                <div class="small fw-medium">${d.kategori || '-'}</div>
+                                <div class="small text-secondary">${d.jenis || '-'}</div>
+                            </td>
+                            <td>
+                                <div class="small fw-medium">${d.platform || '-'}</div>
+                                <div class="small text-secondary">${d.lokasi || '-'}</div>
+                            </td>
+                            <td>
+                                <div class="small fw-medium">${tarikhMula}</div>
+                                <div class="small text-secondary">hingga ${tarikhTamat}</div>
+                            </td>
+                            <td><span class="font-heading fw-semibold">${d.jam || '-'}</span></td>
+                            <td><span class="small fw-medium">${d.bayaran ? 'RM '+d.bayaran : '-'}</span></td>
                             <td>${cert}</td>
                             <td class="text-end text-nowrap">
                                 <button class="btn btn-sm text-secondary px-2" onclick="app.editLatihan('${d.id}')" title="Edit"><i class="fas fa-pen"></i></button>
@@ -1264,10 +1324,13 @@
                     document.getElementById('l_platform').value = d.platform;
                     document.getElementById('l_lokasi').value = d.lokasi;
                     document.getElementById('l_anjuran').value = d.anjuran;
-                    document.getElementById('l_tarikh').value = d.tarikh;
+                    
+                    document.getElementById('l_tarikh_mula').value = d.tarikh || '';
+                    document.getElementById('l_tarikh_tamat').value = d.tarikhTamat || '';
+                    
                     document.getElementById('l_jam').value = d.jam;
                     document.getElementById('l_bayaran').value = d.bayaran;
-                    document.getElementById('l_catatan').value = d.catatan;
+                    document.getElementById('l_catatan').value = d.catatan || '';
                     document.getElementById('l_sijil_url_existing').value = d.sijilUrl || '';
                     this.openModal('modalLatihan');
                 }
@@ -1275,6 +1338,7 @@
             saveLatihan: function(e) {
                 e.preventDefault();
                 this.showLoader();
+                
                 const record = {
                     id: document.getElementById('l_id').value,
                     tajuk: document.getElementById('l_tajuk').value,
@@ -1283,7 +1347,8 @@
                     platform: document.getElementById('l_platform').value,
                     lokasi: document.getElementById('l_lokasi').value,
                     anjuran: document.getElementById('l_anjuran').value,
-                    tarikh: document.getElementById('l_tarikh').value,
+                    tarikh: document.getElementById('l_tarikh_mula').value,
+                    tarikhTamat: document.getElementById('l_tarikh_tamat').value,
                     jam: document.getElementById('l_jam').value,
                     bayaran: document.getElementById('l_bayaran').value,
                     catatan: document.getElementById('l_catatan').value,
@@ -1463,10 +1528,7 @@
                     profil: { nama: "Husna", jawatan: "Senior Analyst" },
                     penempatan: [],
                     latihan: [
-                        { id: "1", tajuk: "MS Excel Advanced", kategori: "Technical", jenis: "Short Course", platform: "Online", anjuran: "Tech Academy", tarikh: `${this.currentYear}-05-10`, jam: "16", bayaran: "0" },
-                        { id: "2", tajuk: "Leadership Skills", kategori: "Soft Skills", jenis: "Seminar", platform: "In-Person", anjuran: "HR Dept", tarikh: `${this.currentYear}-05-15`, jam: "8", bayaran: "150" },
-                        { id: "3", tajuk: "Web Development", kategori: "Technical", jenis: "Workshop", platform: "Online", anjuran: "DevInc", tarikh: `${this.currentYear}-05-19`, jam: "24", bayaran: "0" },
-                        { id: "4", tajuk: "Sales Training", kategori: "Management", jenis: "Seminar", platform: "In-Person", anjuran: "Sales Inc", tarikh: `${this.currentYear}-05-21`, jam: "6", bayaran: "0" }
+                        { id: "1", tajuk: "MS Excel Advanced", kategori: "DALAM NEGERI", jenis: "FUNCTIONAL", platform: "TIDAK BERSEMUKA (ATAS TALIAN)", anjuran: "Tech Academy", tarikh: `${this.currentYear}-05-10`, tarikhTamat: `${this.currentYear}-05-12`, jam: "16H", bayaran: "0", catatan: "" }
                     ]
                 };
             }
