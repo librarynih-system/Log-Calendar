@@ -940,12 +940,8 @@
             },
 
             populateYearDropdown: function() {
-                const years = [...new Set(this.state.latihan.map(d => {
-                    const date = new Date(d.tarikh);
-                    return isNaN(date.getTime()) ? null : date.getFullYear();
-                }))].filter(y => y !== null).sort((a,b)=>b-a);
-                
-                if(!years.includes(this.currentYear)) years.unshift(this.currentYear);
+                // Tetapkan senarai tahun secara statik dari 2030 hingga 2022
+                const years = [2030, 2029, 2028, 2027, 2026, 2025, 2024, 2023, 2022];
                 
                 const select = document.getElementById('globalYear');
                 const currentSelection = select.value;
@@ -964,9 +960,8 @@
                     select.value = this.currentYear;
                 }
                 
-                if(years.length > 0) {
-                    document.getElementById('dash-start-year').textContent = Math.min(...years);
-                }
+                // Tetapkan tahun permulaan di Dashboard secara kekal kepada 2022
+                document.getElementById('dash-start-year').textContent = "2022";
             },
             
             renderAll: function() {
