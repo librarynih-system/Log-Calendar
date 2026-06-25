@@ -136,7 +136,7 @@
 
         .table-responsive { overflow-x: auto; width: 100%; }
         .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-        .custom-table th, .custom-table td { padding: 1rem; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
+        .custom-table th, .custom-table td { padding: 1.5rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
         .custom-table th { color: var(--text-secondary); font-weight: 600; font-size: 0.85rem; }
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
         .status-completed { background: var(--c-sage-bg); color: var(--c-sage-txt); }
@@ -1277,7 +1277,7 @@
                 const tbody = document.querySelector('#tableLatihan tbody');
                 tbody.innerHTML = '';
                 sortedLatihan.forEach((d) => {
-                    const cert = (d.sijilUrl && d.sijilUrl.length > 5) ? `<a href="${d.sijilUrl}" target="_blank" style="color: var(--accent-color);"><i class="fas fa-certificate"></i> View</a>` : `-`;
+                    const cert = (d.sijilUrl && d.sijilUrl.length > 5) ? `<a href="${d.sijilUrl}" target="_blank" class="d-flex flex-column align-items-center text-center" style="color: var(--accent-color); text-decoration: none;"><i class="fas fa-certificate fs-5 mb-1"></i><span class="small fw-bold">View</span></a>` : `<span class="text-secondary">-</span>`;
                     
                     // Fallback to manage old format backend data safely
                     const tarikhMula = d.tarikh || '-';
@@ -1286,27 +1286,29 @@
                     tbody.innerHTML += `
                         <tr>
                             <td>
-                                <div class="font-heading fw-semibold">${d.tajuk || '-'}</div>
-                                <div class="small text-secondary"><i class="fas fa-building me-1"></i>${d.anjuran || '-'}</div>
+                                <div class="font-heading fw-semibold" style="font-size: 0.95rem;">${d.tajuk || '-'}</div>
+                                <div class="small text-secondary mt-2"><i class="fas fa-building me-1"></i> ${d.anjuran || '-'}</div>
                             </td>
                             <td>
                                 <div class="small fw-medium">${d.kategori || '-'}</div>
-                                <div class="small text-secondary">${d.jenis || '-'}</div>
+                                <div class="small text-secondary mt-2">${d.jenis || '-'}</div>
                             </td>
                             <td>
                                 <div class="small fw-medium">${d.platform || '-'}</div>
-                                <div class="small text-secondary">${d.lokasi || '-'}</div>
+                                <div class="small text-secondary mt-2">${d.lokasi || '-'}</div>
                             </td>
                             <td>
                                 <div class="small fw-medium">${tarikhMula}</div>
-                                <div class="small text-secondary">hingga ${tarikhTamat}</div>
+                                <div class="small text-secondary mt-2">hingga ${tarikhTamat}</div>
                             </td>
                             <td><span class="font-heading fw-semibold">${d.jam || '-'}</span></td>
                             <td><span class="small fw-medium">${d.bayaran ? 'RM '+d.bayaran : '-'}</span></td>
                             <td>${cert}</td>
                             <td class="text-end text-nowrap">
-                                <button class="btn btn-sm text-secondary px-2" onclick="app.editLatihan('${d.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-                                <button class="btn btn-sm text-danger px-2" onclick="app.deleteLatihan('${d.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                <div class="d-flex justify-content-end align-items-center gap-3">
+                                    <button class="btn btn-sm text-secondary p-1" onclick="app.editLatihan('${d.id}')" title="Edit"><i class="fas fa-pen fs-6"></i></button>
+                                    <button class="btn btn-sm text-danger p-1" onclick="app.deleteLatihan('${d.id}')" title="Delete"><i class="fas fa-trash fs-6"></i></button>
+                                </div>
                             </td>
                         </tr>
                     `;
