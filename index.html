@@ -629,11 +629,18 @@
                             <input type="text" id="l_jam" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">BAYARAN (RM) (JIKA ADA)</label>
-                            <input type="number" id="l_bayaran" class="form-control" step="0.01" min="0">
+                            <label class="form-label">BAYARAN (RM)</label>
+                            <input type="number" id="l_bayaran" class="form-control" step="0.01" min="0" placeholder="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">STATUS SIJIL <span class="text-danger">*</span></label>
+                            <select id="l_sijil_status" class="form-select" required>
+                                <option value="TIADA">TIADA</option>
+                                <option value="ADA">ADA</option>
+                            </select>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">SIJIL (JIKA ADA SILA LAMPIRKAN BERSAMA)</label>
+                            <label class="form-label">SIJIL (JIKA DIGITAL SILA UPLOAD)</label>
                             <input class="form-control" type="file" id="l_sijil_file" accept=".pdf,.jpg,.jpeg,.png">
                         </div>
                     </div>
@@ -1290,12 +1297,20 @@
                 
                 // 2. UBAH DI SINI: Tambah parameter 'index' untuk penjanaan nombor berurutan
                 sortedLatihan.forEach((d, index) => {
-                    const cert = (d.sijilUrl && d.sijilUrl.length > 5) ? `<a href="${d.sijilUrl}" target="_blank" class="d-flex flex-column align-items-center text-center" style="color: var(--accent-color); text-decoration: none;"><i class="fas fa-certificate fs-5 mb-1"></i><span class="small fw-bold">View</span></a>` : `<span class="text-secondary">-</span>`;
+                    let cert = `<span class="text-secondary">TIADA</span>`;
+                    if (d.sijilUrl && d.sijilUrl.startsWith('http')) {
+                        cert = `<a href="${d.sijilUrl}" target="_blank" class="d-flex flex-column align-items-center text-center" style="color: var(--accent-color); text-decoration: none;"><i class="fas fa-certificate fs-5 mb-1"></i><span class="small fw-bold">View</span></a>`;
+                    } else if (d.sijilUrl === 'ADA') {
+                        cert = `<span class="small fw-bold" style="color: var(--accent-color);">ADA</span>`;
+                    }
                     
                     // Fallback to manage old format backend data safely
                     const tarikhMula = this.formatDMY(d.tarikh);
                     const rawTamat = (d.catatan && d.catatan.includes('-')) ? d.catatan : (d.catatan || d.tarikh || '-');
                     const tarikhTamat = this.formatDMY(rawTamat);
+                    
+                    const bayaranNum = parseFloat(d.bayaran);
+                    const bayaranPaparan = isNaN(bayaranNum) ? 'RM 0' : 'RM ' + bayaranNum;
 
                     tbody.innerHTML += `
                         <tr>
@@ -1318,7 +1333,7 @@
                                 <div class="small text-secondary mt-2">hingga ${tarikhTamat}</div>
                             </td>
                             <td><span class="font-heading fw-semibold">${d.jam || '-'}</span></td>
-                            <td><span class="small fw-medium">${d.bayaran ? 'RM '+d.bayaran : '-'}</span></td>
+                            <td><span class="small fw-medium">${bayaranPaparan}</span></td>
                             <td>${cert}</td>
                             <td class="text-end text-nowrap">
                                 <div class="d-flex justify-content-end align-items-center gap-3">
@@ -1350,14 +1365,29 @@
                     document.getElementById('l_tarikh_tamat').value = tTamat;
                     
                     document.getElementById('l_jam').value = d.jam;
-                    document.getElementById('l_bayaran').value = d.bayaran;
+                    document.getElementById('l_bayaran').value = d.bayaran || 0;
                     document.getElementById('l_sijil_url_existing').value = d.sijilUrl || '';
+                    
+                    let statusVal = 'TIADA';
+                    if (d.sijilUrl && d.sijilUrl.startsWith('http')) statusVal = 'ADA';
+                    else if (d.sijilUrl === 'ADA') statusVal = 'ADA';
+                    document.getElementById('l_sijil_status').value = statusVal;
+                    
                     this.openModal('modalLatihan');
                 }
             },
             saveLatihan: function(e) {
                 e.preventDefault();
                 this.showLoader();
+                
+                let sijilStatus = document.getElementById('l_sijil_status').value;
+                let sijilUrlVal = document.getElementById('l_sijil_url_existing').value;
+                
+                if (sijilStatus === 'TIADA') {
+                    sijilUrlVal = 'TIADA';
+                } else if (sijilStatus === 'ADA') {
+                    if (!sijilUrlVal || sijilUrlVal === 'TIADA') sijilUrlVal = 'ADA';
+                }
                 
                 // Mapped to ensure Google Spreadsheet compatibility
                 // Tarikh Mula -> tarikh (Col 8), Tarikh Tamat -> catatan (Col 9 based on updated Code.gs)
@@ -1371,13 +1401,14 @@
                     anjuran: document.getElementById('l_anjuran').value,
                     tarikh: document.getElementById('l_tarikh_mula').value,
                     jam: document.getElementById('l_jam').value,
-                    bayaran: document.getElementById('l_bayaran').value,
+                    bayaran: document.getElementById('l_bayaran').value || 0,
                     catatan: document.getElementById('l_tarikh_tamat').value,
-                    sijilUrl: document.getElementById('l_sijil_url_existing').value
+                    sijilUrl: sijilUrlVal
                 };
 
                 const fileInput = document.getElementById('l_sijil_file');
-                const file = fileInput.files[0];
+                let file = fileInput.files[0];
+                if (sijilStatus === 'TIADA') file = null;
 
                 if(file) {
                     const reader = new FileReader();
