@@ -134,10 +134,19 @@
         .cal-date.today { color: var(--accent-color); background: var(--bg-surface-hover); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
         .course-pill { font-size: 0.7rem; padding: 4px 6px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
 
-        .table-responsive { overflow-x: auto; width: 100%; }
-        .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        /* Tables & Responsive Containers Updated for Sticky Headers */
+        .table-responsive { overflow: auto; width: 100%; max-height: 65vh; }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 1rem; }
         .custom-table th, .custom-table td { padding: 1.5rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
-        .custom-table th { color: var(--text-secondary); font-weight: 600; font-size: 0.85rem; }
+        .custom-table th { 
+            color: var(--text-secondary); 
+            font-weight: 600; 
+            font-size: 0.85rem; 
+            position: sticky; 
+            top: 0; 
+            background-color: var(--bg-surface); 
+            z-index: 10; 
+        }
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
         .status-completed { background: var(--c-sage-bg); color: var(--c-sage-txt); }
         .status-progress { background: var(--c-peach-bg); color: var(--c-peach-txt); }
