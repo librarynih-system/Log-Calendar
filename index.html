@@ -202,7 +202,7 @@
         }
 
         /* Profile & Profile Photo Upload Styles */
-        .avatar-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); background-color: var(--bg-main); }
+        .avatar-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); background: var(--bg-main); }
         .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; cursor: pointer; }
         .upload-btn-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; }
         .border-danger { border-color: #E53E3E !important; }
@@ -1036,21 +1036,49 @@
                 document.getElementById('sum-hours').textContent = hours;
                 document.getElementById('sum-avg').textContent = yearData.length > 0 ? (hours / yearData.length).toFixed(1) : 0;
 
-                const recent = [...data].sort((a,b) => new Date(b.tarikh) - new Date(a.tarikh)).slice(0, 5);
                 const tbody = document.getElementById('recent-table-body');
                 tbody.innerHTML = '';
-                recent.forEach(d => {
-                    let stClass = "status-completed"; let stText = "Completed";
-                    if(new Date(d.tarikh) > new Date()) { stClass = "status-progress"; stText = "Upcoming"; }
-                    const formattedDate = this.formatDMY(d.tarikh);
+                
+                // Kumpulan kursus terkini mengikut tahun
+                const groupedRecent = {};
+                data.forEach(d => {
+                    const y = new Date(d.tarikh).getFullYear();
+                    const year = isNaN(y) ? 'Tiada Tarikh' : y;
+                    if(!groupedRecent[year]) groupedRecent[year] = [];
+                    groupedRecent[year].push(d);
+                });
+                
+                const sortedRecentYears = Object.keys(groupedRecent).sort((a,b) => {
+                    if(a === 'Tiada Tarikh') return 1;
+                    if(b === 'Tiada Tarikh') return -1;
+                    return b - a; // Descending years
+                });
+
+                sortedRecentYears.forEach(year => {
+                    // Sort within year: descending
+                    groupedRecent[year].sort((a,b) => new Date(b.tarikh) - new Date(a.tarikh));
+                    
                     tbody.innerHTML += `
-                        <tr>
-                            <td><div class="font-heading" style="color: var(--text-primary); font-weight:600;">${d.tajuk}</div></td>
-                            <td class="text-secondary small">${formattedDate}</td>
-                            <td class="text-secondary small d-none d-sm-table-cell">${d.platform || '-'}</td>
-                            <td><span class="status-badge ${stClass}">${stText}</span></td>
+                        <tr style="background-color: var(--bg-main);">
+                            <td colspan="4" class="font-heading fw-bold py-3" style="color: var(--accent-color); font-size: 1.05rem; letter-spacing: 0.5px;">
+                                TAHUN ${year}
+                            </td>
                         </tr>
                     `;
+
+                    groupedRecent[year].forEach(d => {
+                        let stClass = "status-completed"; let stText = "Completed";
+                        if(new Date(d.tarikh) > new Date()) { stClass = "status-progress"; stText = "Upcoming"; }
+                        const formattedDate = this.formatDMY(d.tarikh);
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><div class="font-heading" style="color: var(--text-primary); font-weight:600;">${d.tajuk}</div></td>
+                                <td class="text-secondary small">${formattedDate}</td>
+                                <td class="text-secondary small d-none d-sm-table-cell">${d.platform || '-'}</td>
+                                <td><span class="status-badge ${stClass}">${stText}</span></td>
+                            </tr>
+                        `;
+                    });
                 });
 
                 this.renderCalendar();
@@ -1299,59 +1327,81 @@
 
             // --- MODULE 3: LATIHAN ---
             renderTableLatihan: function() {
-                // 1. UBAH DI SINI: Susun rekod secara kronologi (ascending: a.tarikh - b.tarikh)
-                const sortedLatihan = [...this.state.latihan].sort((a, b) => new Date(a.tarikh) - new Date(b.tarikh));
                 const tbody = document.querySelector('#tableLatihan tbody');
                 tbody.innerHTML = '';
                 
-                // 2. UBAH DI SINI: Tambah parameter 'index' untuk penjanaan nombor berurutan
-                sortedLatihan.forEach((d, index) => {
-                    let cert = `<span class="text-secondary">TIADA</span>`;
-                    if (d.sijilUrl && d.sijilUrl.startsWith('http')) {
-                        cert = `<a href="${d.sijilUrl}" target="_blank" class="d-flex flex-column align-items-center text-center" style="color: var(--accent-color); text-decoration: none;"><i class="fas fa-certificate fs-5 mb-1"></i><span class="small fw-bold">View</span></a>`;
-                    } else if (d.sijilUrl === 'ADA') {
-                        cert = `<span class="small fw-bold" style="color: var(--accent-color);">ADA</span>`;
-                    }
-                    
-                    // Fallback to manage old format backend data safely
-                    const tarikhMula = this.formatDMY(d.tarikh);
-                    const rawTamat = (d.catatan && d.catatan.includes('-')) ? d.catatan : (d.catatan || d.tarikh || '-');
-                    const tarikhTamat = this.formatDMY(rawTamat);
-                    
-                    const bayaranNum = parseFloat(d.bayaran);
-                    const bayaranPaparan = isNaN(bayaranNum) ? 'RM 0' : 'RM ' + bayaranNum;
+                const groupedLatihan = {};
+                this.state.latihan.forEach(d => {
+                    const y = new Date(d.tarikh).getFullYear();
+                    const year = isNaN(y) ? 'Tiada Tarikh' : y;
+                    if(!groupedLatihan[year]) groupedLatihan[year] = [];
+                    groupedLatihan[year].push(d);
+                });
+                
+                const sortedYears = Object.keys(groupedLatihan).sort((a,b) => {
+                    if(a === 'Tiada Tarikh') return 1;
+                    if(b === 'Tiada Tarikh') return -1;
+                    return b - a; // Descending years
+                });
+
+                sortedYears.forEach(year => {
+                    // Sort within year: ascending (chronological)
+                    groupedLatihan[year].sort((a, b) => new Date(a.tarikh) - new Date(b.tarikh));
 
                     tbody.innerHTML += `
-                        <tr>
-                            <!-- 3. UBAH DI SINI: Ganti ${d.id || '-'} dengan ${index + 1} -->
-                            <td><div class="small fw-medium">${index + 1}</div></td>
-                            <td>
-                                <div class="font-heading fw-semibold" style="font-size: 0.95rem;">${d.tajuk || '-'}</div>
-                                <div class="small text-secondary mt-2"><i class="fas fa-building me-1"></i> ${d.anjuran || '-'}</div>
-                            </td>
-                            <td>
-                                <div class="small fw-medium">${d.kategori || '-'}</div>
-                                <div class="small text-secondary mt-2">${d.jenis || '-'}</div>
-                            </td>
-                            <td>
-                                <div class="small fw-medium">${d.platform || '-'}</div>
-                                <div class="small text-secondary mt-2">${d.lokasi || '-'}</div>
-                            </td>
-                            <td>
-                                <div class="small fw-medium">${tarikhMula}</div>
-                                <div class="small text-secondary mt-2">hingga ${tarikhTamat}</div>
-                            </td>
-                            <td><span class="font-heading fw-semibold">${d.jam || '-'}</span></td>
-                            <td><span class="small fw-medium">${bayaranPaparan}</span></td>
-                            <td>${cert}</td>
-                            <td class="text-end text-nowrap">
-                                <div class="d-flex justify-content-end align-items-center gap-3">
-                                    <button class="btn btn-sm text-secondary p-1" onclick="app.editLatihan('${d.id}')" title="Edit"><i class="fas fa-pen fs-6"></i></button>
-                                    <button class="btn btn-sm text-danger p-1" onclick="app.deleteLatihan('${d.id}')" title="Delete"><i class="fas fa-trash fs-6"></i></button>
-                                </div>
+                        <tr style="background-color: var(--bg-main);">
+                            <td colspan="9" class="font-heading fw-bold py-3" style="color: var(--accent-color); font-size: 1.05rem; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">
+                                TAHUN ${year}
                             </td>
                         </tr>
                     `;
+                    
+                    groupedLatihan[year].forEach((d, index) => {
+                        let cert = `<span class="text-secondary">TIADA</span>`;
+                        if (d.sijilUrl && d.sijilUrl.startsWith('http')) {
+                            cert = `<a href="${d.sijilUrl}" target="_blank" class="d-flex flex-column align-items-center text-center" style="color: var(--accent-color); text-decoration: none;"><i class="fas fa-certificate fs-5 mb-1"></i><span class="small fw-bold">View</span></a>`;
+                        } else if (d.sijilUrl === 'ADA') {
+                            cert = `<span class="small fw-bold" style="color: var(--accent-color);">ADA</span>`;
+                        }
+                        
+                        const tarikhMula = this.formatDMY(d.tarikh);
+                        const rawTamat = (d.catatan && d.catatan.includes('-')) ? d.catatan : (d.catatan || d.tarikh || '-');
+                        const tarikhTamat = this.formatDMY(rawTamat);
+                        
+                        const bayaranNum = parseFloat(d.bayaran);
+                        const bayaranPaparan = isNaN(bayaranNum) ? 'RM 0' : 'RM ' + bayaranNum;
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><div class="small fw-medium">${index + 1}</div></td>
+                                <td>
+                                    <div class="font-heading fw-semibold" style="font-size: 0.95rem;">${d.tajuk || '-'}</div>
+                                    <div class="small text-secondary mt-2"><i class="fas fa-building me-1"></i> ${d.anjuran || '-'}</div>
+                                </td>
+                                <td>
+                                    <div class="small fw-medium">${d.kategori || '-'}</div>
+                                    <div class="small text-secondary mt-2">${d.jenis || '-'}</div>
+                                </td>
+                                <td>
+                                    <div class="small fw-medium">${d.platform || '-'}</div>
+                                    <div class="small text-secondary mt-2">${d.lokasi || '-'}</div>
+                                </td>
+                                <td>
+                                    <div class="small fw-medium">${tarikhMula}</div>
+                                    <div class="small text-secondary mt-2">hingga ${tarikhTamat}</div>
+                                </td>
+                                <td><span class="font-heading fw-semibold">${d.jam || '-'}</span></td>
+                                <td><span class="small fw-medium">${bayaranPaparan}</span></td>
+                                <td>${cert}</td>
+                                <td class="text-end text-nowrap">
+                                    <div class="d-flex justify-content-end align-items-center gap-3">
+                                        <button class="btn btn-sm text-secondary p-1" onclick="app.editLatihan('${d.id}')" title="Edit"><i class="fas fa-pen fs-6"></i></button>
+                                        <button class="btn btn-sm text-danger p-1" onclick="app.deleteLatihan('${d.id}')" title="Delete"><i class="fas fa-trash fs-6"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
                 });
             },
             editLatihan: function(id) {
