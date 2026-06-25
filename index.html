@@ -1451,7 +1451,7 @@
 
             // --- MODULE 4: PENEMPATAN ---
             renderPenempatan: function() {
-                const sortedPenempatan = [...this.state.penempatan].sort((a, b) => new Date(b.mula) - new Date(a.mula));
+                const sortedPenempatan = [...this.state.penempatan].sort((a, b) => new Date(b.lantikan) - new Date(a.lantikan));
                 const tbody = document.querySelector('#tablePenempatan tbody');
                 tbody.innerHTML = '';
                 sortedPenempatan.forEach(d => {
@@ -1459,18 +1459,22 @@
                     const tamatDMY = d.bersara ? this.formatDMY(d.bersara) : 'Present';
                     tbody.innerHTML += `
                         <tr>
-                            <td>
-                                <div class="small fw-medium">${mulaDMY}</div>
-                                <div class="small text-secondary mt-2">hingga ${tamatDMY}</div>
-                            </td>
+                            <td><span class="status-badge status-progress">${d.taraf || '-'}</span></td>
                             <td>
                                 <div class="font-heading fw-semibold" style="font-size: 0.95rem;">${d.kumpulan || '-'}</div>
                                 <div class="small text-secondary mt-2">${d.skim || '-'}</div>
                             </td>
                             <td>
+                                <div class="small fw-medium">${mulaDMY}</div>
+                                <div class="small text-secondary mt-2">hingga ${tamatDMY}</div>
+                            </td>
+                            <td>
                                 <div class="small fw-medium">${d.lokasi || '-'}</div>
                             </td>
-                            <td><span class="status-badge ${d.status==='Semasa'?'status-completed':'status-progress'}">${d.taraf || '-'}</span></td>
+                            <td>
+                                <div class="small fw-medium">${d.peperiksaan || '-'}</div>
+                                <div class="small text-secondary mt-2">${d.akademik || '-'}</div>
+                            </td>
                             <td class="text-end text-nowrap">
                                 <div class="d-flex justify-content-end align-items-center gap-3">
                                     <button class="btn btn-sm text-secondary p-1" onclick="app.editPenempatan('${d.id}')" title="Edit"><i class="fas fa-pen fs-6"></i></button>
