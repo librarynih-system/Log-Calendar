@@ -1435,8 +1435,8 @@
                 });
 
                 sortedYears.forEach((year, index) => {
-                    // Sort within year: descending (newest on top)
-                    groupedLatihan[year].sort((a, b) => new Date(b.tarikh) - new Date(a.tarikh));
+                    // Sort within year: ascending (Jan - Dec)
+                    groupedLatihan[year].sort((a, b) => new Date(a.tarikh) - new Date(b.tarikh));
                     
                     const recordCount = groupedLatihan[year].length;
                     const isFirst = index === 0;
