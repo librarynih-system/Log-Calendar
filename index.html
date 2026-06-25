@@ -902,9 +902,11 @@
                 
                 if (targetId === 'latihan') {
                     const accordions = document.querySelectorAll('#latihan-accordion-container .year-accordion');
-                    accordions.forEach(acc => {
-                        let hasVisibleRow = false;
+                    
+                    accordions.forEach((acc, idx) => {
                         const rows = acc.querySelectorAll('tbody tr');
+                        let hasVisibleRow = false;
+                        
                         rows.forEach(row => {
                             const text = row.innerText.toLowerCase();
                             if (text.includes(query)) {
@@ -915,21 +917,41 @@
                             }
                         });
                         
-                        acc.style.display = (hasVisibleRow || query === '') ? '' : 'none';
+                        const bodyEl = acc.querySelector('.year-accordion-body');
+                        const iconEl = acc.querySelector('.folder-icon');
+                        const chevronEl = acc.querySelector('.accordion-chevron');
                         
-                        // Auto open accordion if searching and matches found
-                        if (query !== '') {
+                        if (query === '') {
+                            // Reset to default state: show all accordions, but only open the newest year (first one)
+                            acc.style.display = '';
+                            if (idx === 0) {
+                                bodyEl.classList.add('show');
+                                iconEl.classList.remove('fa-folder');
+                                iconEl.classList.add('fa-folder-open');
+                                chevronEl.classList.remove('fa-chevron-down');
+                                chevronEl.classList.add('fa-chevron-up');
+                            } else {
+                                bodyEl.classList.remove('show');
+                                iconEl.classList.remove('fa-folder-open');
+                                iconEl.classList.add('fa-folder');
+                                chevronEl.classList.remove('fa-chevron-up');
+                                chevronEl.classList.add('fa-chevron-down');
+                            }
+                        } else {
+                            // Search state: show the accordion only if it has matching rows, and open it automatically
+                            acc.style.display = hasVisibleRow ? '' : 'none';
                             if (hasVisibleRow) {
-                                const bodyEl = acc.querySelector('.year-accordion-body');
-                                const iconEl = acc.querySelector('.folder-icon');
-                                const chevronEl = acc.querySelector('.accordion-chevron');
-                                if(!bodyEl.classList.contains('show')) {
-                                    bodyEl.classList.add('show');
-                                    iconEl.classList.remove('fa-folder');
-                                    iconEl.classList.add('fa-folder-open');
-                                    chevronEl.classList.remove('fa-chevron-down');
-                                    chevronEl.classList.add('fa-chevron-up');
-                                }
+                                bodyEl.classList.add('show');
+                                iconEl.classList.remove('fa-folder');
+                                iconEl.classList.add('fa-folder-open');
+                                chevronEl.classList.remove('fa-chevron-down');
+                                chevronEl.classList.add('fa-chevron-up');
+                            } else {
+                                bodyEl.classList.remove('show');
+                                iconEl.classList.remove('fa-folder-open');
+                                iconEl.classList.add('fa-folder');
+                                chevronEl.classList.remove('fa-chevron-up');
+                                chevronEl.classList.add('fa-chevron-down');
                             }
                         }
                     });
@@ -1357,23 +1379,41 @@
 
             // --- MODULE 3: LATIHAN ---
             toggleAccordion: function(headerEl) {
-                const bodyEl = headerEl.nextElementSibling;
-                const iconEl = headerEl.querySelector('.folder-icon');
-                const chevronEl = headerEl.querySelector('.accordion-chevron');
+                const container = document.getElementById('latihan-accordion-container');
+                const currentAccordion = headerEl.parentElement;
                 
-                if (bodyEl.classList.contains('show')) {
-                    bodyEl.classList.remove('show');
-                    iconEl.classList.remove('fa-folder-open');
-                    iconEl.classList.add('fa-folder');
-                    chevronEl.classList.remove('fa-chevron-up');
-                    chevronEl.classList.add('fa-chevron-down');
-                } else {
-                    bodyEl.classList.add('show');
-                    iconEl.classList.remove('fa-folder');
-                    iconEl.classList.add('fa-folder-open');
-                    chevronEl.classList.remove('fa-chevron-down');
-                    chevronEl.classList.add('fa-chevron-up');
-                }
+                // Cari semua accordion
+                const allAccordions = container.querySelectorAll('.year-accordion');
+                
+                allAccordions.forEach(acc => {
+                    const bodyEl = acc.querySelector('.year-accordion-body');
+                    const iconEl = acc.querySelector('.folder-icon');
+                    const chevronEl = acc.querySelector('.accordion-chevron');
+                    
+                    if (acc === currentAccordion) {
+                        // Buka/Tutup accordion yang diklik
+                        if (bodyEl.classList.contains('show')) {
+                            bodyEl.classList.remove('show');
+                            iconEl.classList.remove('fa-folder-open');
+                            iconEl.classList.add('fa-folder');
+                            chevronEl.classList.remove('fa-chevron-up');
+                            chevronEl.classList.add('fa-chevron-down');
+                        } else {
+                            bodyEl.classList.add('show');
+                            iconEl.classList.remove('fa-folder');
+                            iconEl.classList.add('fa-folder-open');
+                            chevronEl.classList.remove('fa-chevron-down');
+                            chevronEl.classList.add('fa-chevron-up');
+                        }
+                    } else {
+                        // Tutup mana-mana accordion yang tidak diklik (Mutual exclusivity)
+                        bodyEl.classList.remove('show');
+                        iconEl.classList.remove('fa-folder-open');
+                        iconEl.classList.add('fa-folder');
+                        chevronEl.classList.remove('fa-chevron-up');
+                        chevronEl.classList.add('fa-chevron-down');
+                    }
+                });
             },
             
             renderTableLatihan: function() {
