@@ -681,7 +681,7 @@
         // ==========================================
         const CONFIG = {
             // IMPORTANT: Replace this with your Google Apps Script Web App URL
-            WEB_APP_URL: "https://script.google.com/macros/s/AKfycbypTYrVYnS84Owd6r2Z7nw-p8sAmEysVFSbRT9sAlPjLaX2DsjK3Kx5iE0g6wEp5toFyA/exec"
+            WEB_APP_URL: "https://script.google.com/macros/s/AKfycbypTYrVYnS84Owd6r2Z7nw-p8sAmEysVFSbRT9sAlPjLaX2DsjK3Kx5iE0g6wEp5toFyA/execE"
         };
 
         const app = {
@@ -1286,7 +1286,7 @@
                 const sortedLatihan = [...this.state.latihan].sort((a, b) => new Date(b.tarikh) - new Date(a.tarikh));
                 const tbody = document.querySelector('#tableLatihan tbody');
                 tbody.innerHTML = '';
-                sortedLatihan.forEach((d) => {
+                sortedLatihan.forEach((d, index) => {
                     const cert = (d.sijilUrl && d.sijilUrl.length > 5) ? `<a href="${d.sijilUrl}" target="_blank" class="d-flex flex-column align-items-center text-center" style="color: var(--accent-color); text-decoration: none;"><i class="fas fa-certificate fs-5 mb-1"></i><span class="small fw-bold">View</span></a>` : `<span class="text-secondary">-</span>`;
                     
                     // Fallback to manage old format backend data safely
@@ -1296,7 +1296,7 @@
 
                     tbody.innerHTML += `
                         <tr>
-                            <td><div class="small fw-medium">${d.id || '-'}</div></td>
+                            <td><div class="small fw-medium">${index + 1}</div></td>
                             <td>
                                 <div class="font-heading fw-semibold" style="font-size: 0.95rem;">${d.tajuk || '-'}</div>
                                 <div class="small text-secondary mt-2"><i class="fas fa-building me-1"></i> ${d.anjuran || '-'}</div>
