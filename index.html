@@ -165,6 +165,12 @@
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Custom Accordion Styles for Folder View */
+        .year-accordion-body { display: none; }
+        .year-accordion-body.show { display: block; animation: fadeIn 0.3s ease; }
+        .cursor-pointer { cursor: pointer; }
+        .user-select-none { user-select: none; }
+
         /* Custom Modals (Framework-free) */
         .modal { display: none; position: fixed; inset: 0; z-index: 1060; background: rgba(45, 55, 72, 0.4); backdrop-filter: blur(2px); justify-content: center; align-items: center; padding: 1rem; }
         .modal.show { display: flex; animation: fadeIn 0.2s ease-out; }
@@ -486,26 +492,11 @@
                         <button class="btn btn-premium" onclick="app.openModal('modalLatihan', true)"><i class="fas fa-plus me-2"></i>Add Record</button>
                     </div>
                     <div class="surface-card">
-                        <div class="d-flex mb-3">
-                            <input type="text" onkeyup="app.filterTable('tableLatihan', this.value)" placeholder="Search courses..." class="form-control" style="max-width: 300px;">
+                        <div class="d-flex mb-4">
+                            <input type="text" onkeyup="app.filterTable('latihan', this.value)" placeholder="Search courses..." class="form-control" style="max-width: 300px;">
                         </div>
-                        <div class="table-responsive">
-                            <table class="custom-table" id="tableLatihan">
-                                <thead>
-                                    <tr>
-                                        <th>BIL</th>
-                                        <th>TAJUK LATIHAN & ANJURAN</th>
-                                        <th>KATEGORI & JENIS</th>
-                                        <th>PLATFORM & LOKASI</th>
-                                        <th>TARIKH (MULA - TAMAT)</th>
-                                        <th>JUMLAH HARI @ JAM</th>
-                                        <th>BAYARAN (RM)</th>
-                                        <th>SIJIL</th>
-                                        <th class="text-end">ACTIONS</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+                        <div id="latihan-accordion-container">
+                            <!-- Accordions dynamically injected here -->
                         </div>
                     </div>
                 </section>
@@ -906,12 +897,48 @@
                 setTimeout(()=> document.getElementById('loader').style.display = 'none', 300); 
             },
 
-            filterTable: function(tableId, query) {
+            filterTable: function(targetId, query) {
                 query = query.toLowerCase();
-                const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-                rows.forEach(row => {
-                    row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
-                });
+                
+                if (targetId === 'latihan') {
+                    const accordions = document.querySelectorAll('#latihan-accordion-container .year-accordion');
+                    accordions.forEach(acc => {
+                        let hasVisibleRow = false;
+                        const rows = acc.querySelectorAll('tbody tr');
+                        rows.forEach(row => {
+                            const text = row.innerText.toLowerCase();
+                            if (text.includes(query)) {
+                                row.style.display = '';
+                                hasVisibleRow = true;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                        
+                        acc.style.display = (hasVisibleRow || query === '') ? '' : 'none';
+                        
+                        // Auto open accordion if searching and matches found
+                        if (query !== '') {
+                            if (hasVisibleRow) {
+                                const bodyEl = acc.querySelector('.year-accordion-body');
+                                const iconEl = acc.querySelector('.folder-icon');
+                                const chevronEl = acc.querySelector('.accordion-chevron');
+                                if(!bodyEl.classList.contains('show')) {
+                                    bodyEl.classList.add('show');
+                                    iconEl.classList.remove('fa-folder');
+                                    iconEl.classList.add('fa-folder-open');
+                                    chevronEl.classList.remove('fa-chevron-down');
+                                    chevronEl.classList.add('fa-chevron-up');
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    const rows = document.querySelectorAll(`#${targetId} tbody tr`);
+                    rows.forEach(row => {
+                        row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+                    });
+                }
             },
             
             updateAvatars: function(name, photoUrl) {
@@ -1059,8 +1086,8 @@
                     groupedRecent[year].sort((a,b) => new Date(b.tarikh) - new Date(a.tarikh));
                     
                     tbody.innerHTML += `
-                        <tr style="background-color: var(--bg-main);">
-                            <td colspan="4" class="font-heading fw-bold py-3" style="color: var(--accent-color); font-size: 1.05rem; letter-spacing: 0.5px;">
+                        <tr style="background-color: transparent;">
+                            <td colspan="4" class="font-heading fw-bold pb-2 pt-4" style="color: var(--text-primary); font-size: 1.1rem; border-bottom: 2px solid var(--border-color);">
                                 TAHUN ${year}
                             </td>
                         </tr>
@@ -1072,8 +1099,11 @@
                         const formattedDate = this.formatDMY(d.tarikh);
                         tbody.innerHTML += `
                             <tr>
-                                <td><div class="font-heading" style="color: var(--text-primary); font-weight:600;">${d.tajuk}</div></td>
-                                <td class="text-secondary small">${formattedDate}</td>
+                                <td>
+                                    <div class="font-heading" style="color: var(--text-primary); font-weight:600; font-size: 0.95rem;">${d.tajuk}</div>
+                                    <div class="small text-secondary mt-1"><i class="fas fa-building me-1"></i> ${d.anjuran || '-'}</div>
+                                </td>
+                                <td class="text-secondary small fw-medium">${formattedDate}</td>
                                 <td class="text-secondary small d-none d-sm-table-cell">${d.platform || '-'}</td>
                                 <td><span class="status-badge ${stClass}">${stText}</span></td>
                             </tr>
@@ -1326,9 +1356,29 @@
             },
 
             // --- MODULE 3: LATIHAN ---
+            toggleAccordion: function(headerEl) {
+                const bodyEl = headerEl.nextElementSibling;
+                const iconEl = headerEl.querySelector('.folder-icon');
+                const chevronEl = headerEl.querySelector('.accordion-chevron');
+                
+                if (bodyEl.classList.contains('show')) {
+                    bodyEl.classList.remove('show');
+                    iconEl.classList.remove('fa-folder-open');
+                    iconEl.classList.add('fa-folder');
+                    chevronEl.classList.remove('fa-chevron-up');
+                    chevronEl.classList.add('fa-chevron-down');
+                } else {
+                    bodyEl.classList.add('show');
+                    iconEl.classList.remove('fa-folder');
+                    iconEl.classList.add('fa-folder-open');
+                    chevronEl.classList.remove('fa-chevron-down');
+                    chevronEl.classList.add('fa-chevron-up');
+                }
+            },
+            
             renderTableLatihan: function() {
-                const tbody = document.querySelector('#tableLatihan tbody');
-                tbody.innerHTML = '';
+                const container = document.getElementById('latihan-accordion-container');
+                container.innerHTML = '';
                 
                 const groupedLatihan = {};
                 this.state.latihan.forEach(d => {
@@ -1344,19 +1394,44 @@
                     return b - a; // Descending years
                 });
 
-                sortedYears.forEach(year => {
-                    // Sort within year: ascending (chronological)
-                    groupedLatihan[year].sort((a, b) => new Date(a.tarikh) - new Date(b.tarikh));
-
-                    tbody.innerHTML += `
-                        <tr style="background-color: var(--bg-main);">
-                            <td colspan="9" class="font-heading fw-bold py-3" style="color: var(--accent-color); font-size: 1.05rem; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">
-                                TAHUN ${year}
-                            </td>
-                        </tr>
+                sortedYears.forEach((year, index) => {
+                    // Sort within year: descending (newest on top)
+                    groupedLatihan[year].sort((a, b) => new Date(b.tarikh) - new Date(a.tarikh));
+                    
+                    const recordCount = groupedLatihan[year].length;
+                    const isFirst = index === 0;
+                    
+                    let html = `
+                        <div class="year-accordion mb-3 border border-1 rounded-3 overflow-hidden" style="border-color: var(--border-color) !important;">
+                            <div class="year-accordion-header p-3 d-flex justify-content-between align-items-center cursor-pointer user-select-none" 
+                                 style="background-color: var(--bg-surface-hover); cursor: pointer;"
+                                 onclick="app.toggleAccordion(this)">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas ${isFirst ? 'fa-folder-open' : 'fa-folder'} folder-icon" style="color: var(--accent-color); width: 24px; font-size: 1.2rem;"></i>
+                                    <span class="font-heading fw-bold fs-6 mb-0 ms-2" style="color: var(--text-primary);">${year} <span class="text-secondary fw-medium fs-6 ms-1">(${recordCount} Rekod)</span></span>
+                                </div>
+                                <i class="fas ${isFirst ? 'fa-chevron-up' : 'fa-chevron-down'} text-secondary accordion-chevron"></i>
+                            </div>
+                            <div class="year-accordion-body ${isFirst ? 'show' : ''}" style="background-color: var(--bg-surface);">
+                                <div class="table-responsive" style="max-height: 50vh;">
+                                    <table class="custom-table w-100 m-0">
+                                        <thead>
+                                            <tr>
+                                                <th>BIL</th>
+                                                <th>TAJUK LATIHAN & ANJURAN</th>
+                                                <th>KATEGORI & JENIS</th>
+                                                <th>PLATFORM & LOKASI</th>
+                                                <th>TARIKH (MULA - TAMAT)</th>
+                                                <th>JUMLAH HARI @ JAM</th>
+                                                <th>BAYARAN (RM)</th>
+                                                <th>SIJIL</th>
+                                                <th class="text-end">ACTIONS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                     `;
                     
-                    groupedLatihan[year].forEach((d, index) => {
+                    groupedLatihan[year].forEach((d, rIndex) => {
                         let cert = `<span class="text-secondary">TIADA</span>`;
                         if (d.sijilUrl && d.sijilUrl.startsWith('http')) {
                             cert = `<a href="${d.sijilUrl}" target="_blank" class="d-flex flex-column align-items-center text-center" style="color: var(--accent-color); text-decoration: none;"><i class="fas fa-certificate fs-5 mb-1"></i><span class="small fw-bold">View</span></a>`;
@@ -1371,9 +1446,9 @@
                         const bayaranNum = parseFloat(d.bayaran);
                         const bayaranPaparan = isNaN(bayaranNum) ? 'RM 0' : 'RM ' + bayaranNum;
 
-                        tbody.innerHTML += `
+                        html += `
                             <tr>
-                                <td><div class="small fw-medium">${index + 1}</div></td>
+                                <td><div class="small fw-medium">${rIndex + 1}</div></td>
                                 <td>
                                     <div class="font-heading fw-semibold" style="font-size: 0.95rem;">${d.tajuk || '-'}</div>
                                     <div class="small text-secondary mt-2"><i class="fas fa-building me-1"></i> ${d.anjuran || '-'}</div>
@@ -1402,6 +1477,16 @@
                             </tr>
                         `;
                     });
+
+                    html += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.innerHTML += html;
                 });
             },
             editLatihan: function(id) {
