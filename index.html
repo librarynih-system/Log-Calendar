@@ -484,14 +484,15 @@
                             <table class="custom-table" id="tableLatihan">
                                 <thead>
                                     <tr>
-                                        <th>Tajuk Latihan & Anjuran</th>
-                                        <th>Kategori & Jenis</th>
-                                        <th>Platform & Lokasi</th>
-                                        <th>Tarikh (Mula - Tamat)</th>
-                                        <th>Jumlah Hari @ Jam</th>
-                                        <th>Bayaran (RM)</th>
-                                        <th>Sijil</th>
-                                        <th class="text-end">Actions</th>
+                                        <th>BIL</th>
+                                        <th>TAJUK LATIHAN & ANJURAN</th>
+                                        <th>KATEGORI & JENIS</th>
+                                        <th>PLATFORM & LOKASI</th>
+                                        <th>TARIKH (MULA - TAMAT)</th>
+                                        <th>JUMLAH HARI @ JAM</th>
+                                        <th>BAYARAN (RM)</th>
+                                        <th>SIJIL</th>
+                                        <th class="text-end">ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -513,11 +514,12 @@
                             <table class="custom-table" id="tablePenempatan">
                                 <thead>
                                     <tr>
-                                        <th>Period</th>
-                                        <th>Position (Grade)</th>
-                                        <th>Department / Unit</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Actions</th>
+                                        <th>TARAF PERKHIDMATAN</th>
+                                        <th>KUMPULAN & SKIM</th>
+                                        <th>TARIKH (LANTIKAN - BERSARA)</th>
+                                        <th>LOKASI / KEMENTERIAN BERTUGAS</th>
+                                        <th>PEPERIKSAAN & AKADEMIK</th>
+                                        <th class="text-end">ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -641,7 +643,7 @@
         </div>
     </div>
 
-    <!-- Placement Modal -->
+    <!-- Placement Modal Updated to New Schema -->
     <div class="modal" id="modalPenempatan">
         <div class="modal-dialog">
             <form id="formPenempatan" onsubmit="app.savePenempatan(event)">
@@ -649,20 +651,19 @@
                 <div class="modal-header"><h5 class="font-heading mb-0" id="pn_modal_title">Add Placement</h5><button type="button" class="btn-close" onclick="app.closeModal('modalPenempatan')"><i class="fas fa-times"></i></button></div>
                 <div class="modal-body">
                     <div class="row g-4">
-                        <div class="col-md-8"><label class="form-label">Position</label><input type="text" id="pn_jawatan" class="form-control" required></div>
-                        <div class="col-md-4"><label class="form-label">Grade</label><input type="text" id="pn_gred" class="form-control" required></div>
-                        <div class="col-md-4"><label class="form-label">Department / Unit</label><input type="text" id="pn_unit" class="form-control" required></div>
-                        <div class="col-md-4"><label class="form-label">Sector</label><input type="text" id="pn_pusat" class="form-control" required></div>
-                        <div class="col-md-4"><label class="form-label">Workplace</label><input type="text" id="pn_institut" class="form-control" required></div>
-                        <div class="col-md-4"><label class="form-label">Start Date</label><input type="date" id="pn_mula" class="form-control" required></div>
-                        <div class="col-md-4"><label class="form-label">End Date</label><input type="date" id="pn_tamat" class="form-control"></div>
-                        <div class="col-md-4">
-                            <label class="form-label">Status</label>
-                            <select id="pn_status" class="form-select" required>
-                                <option value="Semasa">Current</option>
-                                <option value="Tamat">Completed</option>
-                            </select>
-                        </div>
+                        <div class="col-md-4"><label class="form-label">TARAF PERKHIDMATAN</label><input type="text" id="pn_taraf" class="form-control" required></div>
+                        <div class="col-md-4"><label class="form-label">KUMPULAN PERKHIDMATAN</label><input type="text" id="pn_kumpulan" class="form-control" required></div>
+                        <div class="col-md-4"><label class="form-label">SKIM PERKHIDMATAN</label><input type="text" id="pn_skim" class="form-control" required></div>
+                        
+                        <div class="col-md-3"><label class="form-label">TARIKH LANTIKAN</label><input type="date" id="pn_lantikan" class="form-control" required></div>
+                        <div class="col-md-3"><label class="form-label">TARIKH DISAHKAN</label><input type="date" id="pn_disahkan" class="form-control"></div>
+                        <div class="col-md-3"><label class="form-label">TARIKH LAPOR DIRI</label><input type="date" id="pn_lapor" class="form-control"></div>
+                        <div class="col-md-3"><label class="form-label">TARIKH BERSARA</label><input type="date" id="pn_bersara" class="form-control"></div>
+                        
+                        <div class="col-md-12"><label class="form-label">LOKASI / KEMENTERIAN BERTUGAS</label><input type="text" id="pn_lokasi" class="form-control" required></div>
+                        
+                        <div class="col-md-6"><label class="form-label">PEPERIKSAAN PERKHIDMATAN</label><input type="text" id="pn_peperiksaan" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label">KELAYAKAN AKADEMIK</label><input type="text" id="pn_akademik" class="form-control"></div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-minimal" onclick="app.closeModal('modalPenempatan')">Cancel</button><button type="submit" class="btn btn-premium">Save Placement</button></div>
@@ -984,6 +985,14 @@
                 if(!matchJ && !matchH) return parseFloat(str) || 0;
                 return total;
             },
+            
+            // --- HELPER UNTUK FORMAT TARIKH ---
+            formatDMY: function(dateStr) {
+                if (!dateStr || typeof dateStr !== 'string' || !dateStr.includes('-')) return dateStr || '-';
+                const parts = dateStr.split('-');
+                if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                return dateStr;
+            },
 
             // --- MODULE 1: DASHBOARD ---
             renderDashboard: function() {
@@ -1017,10 +1026,11 @@
                 recent.forEach(d => {
                     let stClass = "status-completed"; let stText = "Completed";
                     if(new Date(d.tarikh) > new Date()) { stClass = "status-progress"; stText = "Upcoming"; }
+                    const formattedDate = this.formatDMY(d.tarikh);
                     tbody.innerHTML += `
                         <tr>
                             <td><div class="font-heading" style="color: var(--text-primary); font-weight:600;">${d.tajuk}</div></td>
-                            <td class="text-secondary small">${d.tarikh}</td>
+                            <td class="text-secondary small">${formattedDate}</td>
                             <td class="text-secondary small d-none d-sm-table-cell">${d.platform || '-'}</td>
                             <td><span class="status-badge ${stClass}">${stText}</span></td>
                         </tr>
@@ -1280,11 +1290,13 @@
                     const cert = (d.sijilUrl && d.sijilUrl.length > 5) ? `<a href="${d.sijilUrl}" target="_blank" class="d-flex flex-column align-items-center text-center" style="color: var(--accent-color); text-decoration: none;"><i class="fas fa-certificate fs-5 mb-1"></i><span class="small fw-bold">View</span></a>` : `<span class="text-secondary">-</span>`;
                     
                     // Fallback to manage old format backend data safely
-                    const tarikhMula = d.tarikh || '-';
-                    const tarikhTamat = (d.catatan && d.catatan.includes('-')) ? d.catatan : (d.catatan || d.tarikh || '-');
+                    const tarikhMula = this.formatDMY(d.tarikh);
+                    const rawTamat = (d.catatan && d.catatan.includes('-')) ? d.catatan : (d.catatan || d.tarikh || '-');
+                    const tarikhTamat = this.formatDMY(rawTamat);
 
                     tbody.innerHTML += `
                         <tr>
+                            <td><div class="small fw-medium">${d.id || '-'}</div></td>
                             <td>
                                 <div class="font-heading fw-semibold" style="font-size: 0.95rem;">${d.tajuk || '-'}</div>
                                 <div class="small text-secondary mt-2"><i class="fas fa-building me-1"></i> ${d.anjuran || '-'}</div>
@@ -1443,15 +1455,27 @@
                 const tbody = document.querySelector('#tablePenempatan tbody');
                 tbody.innerHTML = '';
                 sortedPenempatan.forEach(d => {
+                    const mulaDMY = this.formatDMY(d.lantikan);
+                    const tamatDMY = d.bersara ? this.formatDMY(d.bersara) : 'Present';
                     tbody.innerHTML += `
                         <tr>
-                            <td><div class="small">${d.mula} to</div><div class="small">${d.tamat || 'Present'}</div></td>
-                            <td><div class="font-heading fw-semibold">${d.jawatan}</div><div class="small text-secondary">${d.gred}</div></td>
-                            <td><div class="small">${d.unit}</div><div class="small text-secondary">${d.pusat}</div></td>
-                            <td><span class="status-badge ${d.status==='Semasa'?'status-completed':'status-progress'}">${d.status}</span></td>
+                            <td>
+                                <div class="small fw-medium">${mulaDMY}</div>
+                                <div class="small text-secondary mt-2">hingga ${tamatDMY}</div>
+                            </td>
+                            <td>
+                                <div class="font-heading fw-semibold" style="font-size: 0.95rem;">${d.kumpulan || '-'}</div>
+                                <div class="small text-secondary mt-2">${d.skim || '-'}</div>
+                            </td>
+                            <td>
+                                <div class="small fw-medium">${d.lokasi || '-'}</div>
+                            </td>
+                            <td><span class="status-badge ${d.status==='Semasa'?'status-completed':'status-progress'}">${d.taraf || '-'}</span></td>
                             <td class="text-end text-nowrap">
-                                <button class="btn btn-sm text-secondary px-2" onclick="app.editPenempatan('${d.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-                                <button class="btn btn-sm text-danger px-2" onclick="app.deletePenempatan('${d.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                <div class="d-flex justify-content-end align-items-center gap-3">
+                                    <button class="btn btn-sm text-secondary p-1" onclick="app.editPenempatan('${d.id}')" title="Edit"><i class="fas fa-pen fs-6"></i></button>
+                                    <button class="btn btn-sm text-danger p-1" onclick="app.deletePenempatan('${d.id}')" title="Delete"><i class="fas fa-trash fs-6"></i></button>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -1462,14 +1486,16 @@
                 if(d) {
                     document.getElementById('pn_modal_title').textContent = 'Edit Placement';
                     document.getElementById('pn_id').value = d.id;
-                    document.getElementById('pn_jawatan').value = d.jawatan;
-                    document.getElementById('pn_gred').value = d.gred;
-                    document.getElementById('pn_unit').value = d.unit;
-                    document.getElementById('pn_pusat').value = d.pusat;
-                    document.getElementById('pn_institut').value = d.institut;
-                    document.getElementById('pn_mula').value = d.mula;
-                    document.getElementById('pn_tamat').value = d.tamat || '';
-                    document.getElementById('pn_status').value = d.status;
+                    document.getElementById('pn_taraf').value = d.taraf;
+                    document.getElementById('pn_kumpulan').value = d.kumpulan;
+                    document.getElementById('pn_skim').value = d.skim;
+                    document.getElementById('pn_lantikan').value = d.lantikan || '';
+                    document.getElementById('pn_disahkan').value = d.disahkan || '';
+                    document.getElementById('pn_lapor').value = d.lapor || '';
+                    document.getElementById('pn_bersara').value = d.bersara || '';
+                    document.getElementById('pn_lokasi').value = d.lokasi;
+                    document.getElementById('pn_peperiksaan').value = d.peperiksaan;
+                    document.getElementById('pn_akademik').value = d.akademik;
                     this.openModal('modalPenempatan');
                 }
             },
@@ -1478,25 +1504,21 @@
                 this.showLoader();
                 const data = {
                     id: document.getElementById('pn_id').value,
-                    jawatan: document.getElementById('pn_jawatan').value,
-                    gred: document.getElementById('pn_gred').value,
-                    unit: document.getElementById('pn_unit').value,
-                    pusat: document.getElementById('pn_pusat').value,
-                    institut: document.getElementById('pn_institut').value,
-                    mula: document.getElementById('pn_mula').value,
-                    tamat: document.getElementById('pn_tamat').value,
-                    status: document.getElementById('pn_status').value
+                    taraf: document.getElementById('pn_taraf').value,
+                    kumpulan: document.getElementById('pn_kumpulan').value,
+                    skim: document.getElementById('pn_skim').value,
+                    lantikan: document.getElementById('pn_lantikan').value,
+                    disahkan: document.getElementById('pn_disahkan').value,
+                    lapor: document.getElementById('pn_lapor').value,
+                    bersara: document.getElementById('pn_bersara').value,
+                    lokasi: document.getElementById('pn_lokasi').value,
+                    peperiksaan: document.getElementById('pn_peperiksaan').value,
+                    akademik: document.getElementById('pn_akademik').value
                 };
 
                 const isUpdate = !!data.id;
 
                 const executeSave = () => {
-                    if(data.status === 'Semasa') {
-                        this.state.profil.jawatan = data.jawatan; this.state.profil.gred = data.gred;
-                        this.state.profil.unit = data.unit; this.state.profil.pusat = data.pusat;
-                        this.state.profil.institut = data.institut;
-                        this.state.penempatan.forEach(p => { if(p.id !== data.id) p.status = 'Tamat'; });
-                    }
                     if (isUpdate) {
                         const idx = this.state.penempatan.findIndex(x => x.id === data.id);
                         if(idx > -1) this.state.penempatan[idx] = data;
